@@ -1,0 +1,6 @@
+{
+  "name": "Diário de Produção - PMCD",
+  "description": "Sistema de diário de produção, reconhecimento de imóveis e relatórios do Programa Municipal de Controle da Dengue (PMCD).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
