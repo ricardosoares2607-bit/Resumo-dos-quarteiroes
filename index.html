@@ -3,8 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#166534">
 <title>Diário de Produção - PMCD</title>
 <meta name="description" content="Sistema de diário de produção, reconhecimento de imóveis e relatórios do Programa Municipal de Controle da Dengue (PMCD)." />
 <meta property="og:title" content="Diário de Produção - PMCD" />
@@ -3948,16 +3946,7 @@
   });
 
   monitorarConexaoNuvem();
-
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js")
-        .catch((error) => {
-          console.error("Erro ao registrar service worker:", error);
-        });
-    });
-  }
 </script>
+
 </body>
 </html>
