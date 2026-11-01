@@ -9,6 +9,17 @@
 <meta property="og:description" content="Sistema de controle e andamento dos quarteirões, diário de produção, reconhecimento de imóveis e relatórios do Programa Municipal de Controle da Dengue (PMCD)." />
 <meta property="og:type" content="website" />
 
+<!-- PWA Manifest & Meta Tags -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0e6833">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Andamento dos quarteirões">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&display=swap" rel="stylesheet">
@@ -445,8 +456,11 @@
 
 <h1>Andamento dos quarteirões</h1>
 
-<div class="status-nuvem-container">
+<div class="status-nuvem-container" style="display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap;">
   <span id="statusNuvem" class="badge-nuvem pendente">☁️ Conectando à nuvem...</span>
+  <button id="btnInstalarPWA" class="badge-nuvem" style="display: none; background: #0e6833; color: #fff; border: 1px solid #094722; cursor: pointer; align-items: center; gap: 5px;" title="Instalar aplicativo na tela inicial">
+    📲 Instalar Aplicativo
+  </button>
 </div>
 
 <div class="abas">
@@ -4258,6 +4272,72 @@
 
   monitorarConexaoNuvem();
   iniciarOuvintePMCDResumo();
+</script>
+
+<!-- Registro do Service Worker & Suporte PWA -->
+<script>
+  let deferredPromptPWA = null;
+  const btnInstalar = document.getElementById('btnInstalarPWA');
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => {
+          console.log('Service Worker PWA registrado com sucesso:', reg.scope);
+        })
+        .catch((err) => {
+          console.error('Falha ao registrar Service Worker:', err);
+        });
+    });
+  }
+
+  // Captura do evento de instalação (Chrome, Edge, Android)
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPromptPWA = e;
+    if (btnInstalar) {
+      btnInstalar.style.display = 'inline-flex';
+    }
+  });
+
+  // Ação ao clicar no botão de instalação
+  if (btnInstalar) {
+    btnInstalar.addEventListener('click', async () => {
+      if (deferredPromptPWA) {
+        deferredPromptPWA.prompt();
+        const choice = await deferredPromptPWA.userChoice;
+        if (choice && choice.outcome === 'accepted') {
+          console.log('Instalação aceita pelo usuário.');
+        }
+        deferredPromptPWA = null;
+        btnInstalar.style.display = 'none';
+      } else {
+        const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+        if (isIos) {
+          alert("Para instalar no iOS/Safari:\n1. Toque no ícone Compartilhar (quadrado com seta para cima)\n2. Role as opções e selecione 'Adicionar à Tela de Início'");
+        } else {
+          alert("Para instalar este aplicativo:\nAbra as opções do seu navegador e escolha 'Instalar aplicativo' ou 'Adicionar à tela de início'.");
+        }
+      }
+    });
+  }
+
+  // Ocultar quando já instalado
+  window.addEventListener('appinstalled', () => {
+    console.log('PWA instalado com sucesso.');
+    if (btnInstalar) {
+      btnInstalar.style.display = 'none';
+    }
+  });
+
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+    if (btnInstalar) btnInstalar.style.display = 'none';
+  } else {
+    const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+    if (isIos && btnInstalar) {
+      btnInstalar.style.display = 'inline-flex';
+    }
+  }
 </script>
 
 </body>
