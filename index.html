@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diário de Produção - PMCD</title>
-<meta name="description" content="Sistema de diário de produção, reconhecimento de imóveis e relatórios do Programa Municipal de Controle da Dengue (PMCD)." />
-<meta property="og:title" content="Diário de Produção - PMCD" />
-<meta property="og:description" content="Sistema de diário de produção, reconhecimento de imóveis e relatórios do Programa Municipal de Controle da Dengue (PMCD)." />
+<title>Andamento dos quarteirões - PMCD</title>
+<meta name="description" content="Sistema de controle e andamento dos quarteirões, diário de produção, reconhecimento de imóveis e relatórios do Programa Municipal de Controle da Dengue (PMCD)." />
+<meta property="og:title" content="Andamento dos quarteirões - PMCD" />
+<meta property="og:description" content="Sistema de controle e andamento dos quarteirões, diário de produção, reconhecimento de imóveis e relatórios do Programa Municipal de Controle da Dengue (PMCD)." />
 <meta property="og:type" content="website" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -443,7 +443,7 @@
 </head>
 <body>
 
-<h1>Diário de Produção</h1>
+<h1>Andamento dos quarteirões</h1>
 
 <div class="status-nuvem-container">
   <span id="statusNuvem" class="badge-nuvem pendente">☁️ Conectando à nuvem...</span>
@@ -547,9 +547,11 @@
 <div class="painel oculto" id="painel-resumo">
   <div class="contador" id="contadorResumo"></div>
   <div class="barra-botoes-tabelas">
+    <button class="acao info" onclick="sincronizarResumoPMCDAgora()">🔄 Sincronizar com PMCD</button>
     <button class="acao" onclick="adicionarPagina('resumo')">➕ Nova Dupla de Tabelas</button>
     <button class="acao sucesso" onclick="gerarPDF('resumo')">📄 Gerar PDF</button>
     <button class="acao" onclick="imprimir()">🖨️ Imprimir</button>
+    <span class="badge-nuvem online" id="statusPMCD">☁️ PMCD Conectado (Tempo Real)</span>
   </div>
   <div id="tabelaResumo"></div>
 </div>
@@ -724,6 +726,310 @@
     dbRef = db.ref("diario_producao_pmcd");
     nuvemAtiva = true;
   } catch (err) { console.error("Falha ao inicializar Firebase:", err); }
+
+  // ===== INTEGRAÇÃO COM PMCD - SISTEMA ACE (RESUMO DE RECONHECIMENTO) =====
+  const firebasePMCDConfig = {
+    apiKey: "AIzaSyA1YbZ9uGY3WW5fiMLVpTC2_fC2qKB6vos",
+    authDomain: "tabela-de-lancamentos.firebaseapp.com",
+    databaseURL: "https://tabela-de-lancamentos-default-rtdb.firebaseio.com",
+    projectId: "tabela-de-lancamentos"
+  };
+
+  let pmcdApp = null;
+  let dbPMCDRef = null;
+  let pmcdSincAtiva = false;
+  let ultimoTimestampResumoLocal = 0;
+  let timeoutSalvarPMCD = null;
+
+  try {
+    pmcdApp = (firebase.apps && firebase.apps.find(a => a.name === "pmcd_sync")) || firebase.initializeApp(firebasePMCDConfig, "pmcd_sync");
+    const dbPMCD = pmcdApp.database();
+    dbPMCDRef = dbPMCD.ref("andamento_quarteiroes/resumo_reconhecimento");
+    pmcdSincAtiva = true;
+  } catch (err) {
+    console.error("Falha ao inicializar Firebase PMCD:", err);
+  }
+
+  function atualizarBadgePMCD(conectado, textoCustom) {
+    const badge = document.getElementById("statusPMCD");
+    if (!badge) return;
+    if (textoCustom) {
+      badge.className = "badge-nuvem pendente";
+      badge.textContent = textoCustom;
+      return;
+    }
+    if (conectado) {
+      badge.className = "badge-nuvem online";
+      badge.textContent = "☁️ PMCD Conectado (Tempo Real)";
+    } else {
+      badge.className = "badge-nuvem offline";
+      badge.textContent = "⚡ PMCD Desconectado";
+    }
+  }
+
+  function obterDadosResumoReconhecimento() {
+    const cabecalhoResumo = (cabecalhos.resumo && cabecalhos.resumo[0]) || {};
+    const rodapeResumo = (rodapes.resumo && rodapes.resumo[0]) || {};
+
+    const resumosBoletins = coletarResumosBoletins();
+    const quarteiroesB = Object.keys(resumosBoletins).sort((a, b) => {
+      if (a === "_legacy") return 1;
+      if (b === "_legacy") return -1;
+      return a.localeCompare(b, "pt-BR", { numeric: true });
+    });
+
+    const setQ = new Set(quarteiroesB);
+    const legacy = [];
+    const seen = new Set();
+    const reg = dadosFormularios.resumo || {};
+    Object.keys(reg).forEach(rowKey => {
+      const l = reg[rowKey] || {};
+      const q = String(l.q || "").trim();
+      if (!q || setQ.has(q) || seen.has(q)) return;
+      seen.add(q);
+      legacy.push({
+        q,
+        R: parseInt(l.r, 10) || 0,
+        C: parseInt(l.c, 10) || 0,
+        TB: parseInt(l.tb, 10) || 0,
+        PE: parseInt(l.pe, 10) || 0,
+        O: parseInt(l.o, 10) || 0
+      });
+    });
+    legacy.sort((a, b) => a.q.localeCompare(b.q, "pt-BR", { numeric: true }));
+
+    const listaQuarteiroes = [];
+    const mapaQuarteiroes = {};
+    const totais = { R: 0, C: 0, TB: 0, PE: 0, O: 0, total: 0 };
+
+    quarteiroesB.forEach(q => {
+      const d = resumosBoletins[q];
+      const totalQ = d.total || (d.R + d.C + d.TB + d.PE + d.O);
+      const item = {
+        quarteirao: formatarIdentificador2Digitos(q),
+        origem: "boletins",
+        R: d.R || 0,
+        C: d.C || 0,
+        TB: d.TB || 0,
+        PE: d.PE || 0,
+        O: d.O || 0,
+        total: totalQ
+      };
+      listaQuarteiroes.push(item);
+      mapaQuarteiroes[q] = item;
+      totais.R += item.R;
+      totais.C += item.C;
+      totais.TB += item.TB;
+      totais.PE += item.PE;
+      totais.O += item.O;
+    });
+
+    legacy.forEach(e => {
+      const totalQ = e.R + e.C + e.TB + e.PE + e.O;
+      const item = {
+        quarteirao: formatarIdentificador2Digitos(e.q),
+        origem: "manual",
+        R: e.R,
+        C: e.C,
+        TB: e.TB,
+        PE: e.PE,
+        O: e.O,
+        total: totalQ
+      };
+      listaQuarteiroes.push(item);
+      mapaQuarteiroes[e.q] = item;
+      totais.R += item.R;
+      totais.C += item.C;
+      totais.TB += item.TB;
+      totais.PE += item.PE;
+      totais.O += item.O;
+    });
+
+    totais.total = totais.R + totais.C + totais.TB + totais.PE + totais.O;
+
+    return {
+      timestamp: Date.now(),
+      origem: "andamento_quarteiroes",
+      cabecalho: {
+        uf: cabecalhoResumo.uf || "",
+        distrito: cabecalhoResumo.distrito || "",
+        municipio: cabecalhoResumo.municipio || "",
+        localidade: cabecalhoResumo.localidade || "",
+        subdistrito: cabecalhoResumo.subdistrito || "",
+        sublocal: cabecalhoResumo.sublocal || "",
+        categoria: cabecalhoResumo.categoria || ""
+      },
+      cabecalhos: cabecalhos.resumo || {},
+      rodape: {
+        supervisor: rodapeResumo.supervisor || "",
+        responsavel: rodapeResumo.responsavel || ""
+      },
+      rodapes: rodapes.resumo || {},
+      quarteiroes: listaQuarteiroes,
+      mapaQuarteiroes: mapaQuarteiroes,
+      totais: totais,
+      dadosFormulariosResumo: dadosFormularios.resumo || {},
+      paginas: paginas.resumo || 1,
+      totalQuarteiroes: listaQuarteiroes.length
+    };
+  }
+
+  function salvarResumoReconhecimentoPMCD() {
+    if (!pmcdSincAtiva || !dbPMCDRef) return;
+    try {
+      const payload = obterDadosResumoReconhecimento();
+      ultimoTimestampResumoLocal = payload.timestamp;
+      dbPMCDRef.set(payload)
+        .then(() => {
+          atualizarBadgePMCD(true);
+        })
+        .catch(err => {
+          console.error("Erro ao salvar no PMCD:", err);
+          atualizarBadgePMCD(false);
+        });
+    } catch (err) {
+      console.error("Erro ao preparar dados PMCD:", err);
+    }
+  }
+
+  function salvarResumoReconhecimentoPMCDComAtraso() {
+    clearTimeout(timeoutSalvarPMCD);
+    timeoutSalvarPMCD = setTimeout(() => {
+      salvarResumoReconhecimentoPMCD();
+    }, 350);
+  }
+
+  function aplicarDadosRemotosPMCD(dados) {
+    try {
+      if (!dados) return;
+
+      let alterou = false;
+
+      // 1. Atualizar cabeçalhos
+      if (dados.cabecalhos && typeof dados.cabecalhos === "object") {
+        cabecalhos.resumo = Object.assign({}, cabecalhos.resumo, dados.cabecalhos);
+        alterou = true;
+      } else if (dados.cabecalho && typeof dados.cabecalho === "object") {
+        if (!cabecalhos.resumo) cabecalhos.resumo = {};
+        cabecalhos.resumo[0] = Object.assign({}, cabecalhos.resumo[0], dados.cabecalho);
+        alterou = true;
+      }
+
+      // 2. Atualizar rodapés
+      if (dados.rodapes && typeof dados.rodapes === "object") {
+        rodapes.resumo = Object.assign({}, rodapes.resumo, dados.rodapes);
+        alterou = true;
+      } else if (dados.rodape && typeof dados.rodape === "object") {
+        if (!rodapes.resumo) rodapes.resumo = {};
+        rodapes.resumo[0] = Object.assign({}, rodapes.resumo[0], dados.rodape);
+        alterou = true;
+      }
+
+      // 3. Atualizar dadosFormularios.resumo se fornecido diretamente
+      if (dados.dadosFormulariosResumo && typeof dados.dadosFormulariosResumo === "object") {
+        dadosFormularios.resumo = Object.assign({}, dadosFormularios.resumo, dados.dadosFormulariosResumo);
+        alterou = true;
+      }
+
+      // 4. Se houver array ou objeto de quarteirões recebido do PMCD
+      let lista = [];
+      if (Array.isArray(dados.quarteiroes)) {
+        lista = dados.quarteiroes;
+      } else if (dados.quarteiroes && typeof dados.quarteiroes === "object") {
+        lista = Object.values(dados.quarteiroes);
+      } else if (Array.isArray(dados.linhas)) {
+        lista = dados.linhas;
+      } else if (dados.mapaQuarteiroes && typeof dados.mapaQuarteiroes === "object") {
+        lista = Object.values(dados.mapaQuarteiroes);
+      }
+
+      if (lista.length > 0 && !dados.dadosFormulariosResumo) {
+        if (!dadosFormularios.resumo) dadosFormularios.resumo = {};
+        lista.forEach((item, idx) => {
+          const qVal = item.quarteirao || item.q || item.numero || item.id || "";
+          if (!qVal) return;
+          const p = Math.floor(idx / 64);
+          const t = (Math.floor(idx / 32) % 2) + 1;
+          const l = idx % 32;
+          const rowKey = `${p}_${t}_${l}`;
+          dadosFormularios.resumo[rowKey] = {
+            q: formatarIdentificador2Digitos(qVal),
+            r: String(item.R !== undefined ? item.R : (item.r || 0)),
+            c: String(item.C !== undefined ? item.C : (item.c || 0)),
+            tb: String(item.TB !== undefined ? item.TB : (item.tb || 0)),
+            pe: String(item.PE !== undefined ? item.PE : (item.pe || 0)),
+            o: String(item.O !== undefined ? item.O : (item.o || 0))
+          };
+        });
+        paginas.resumo = Math.max(paginas.resumo || 1, Math.max(1, Math.ceil(lista.length / 64)));
+        alterou = true;
+      } else if (dados.paginas) {
+        paginas.resumo = Math.max(paginas.resumo || 1, parseInt(dados.paginas, 10) || 1);
+      }
+
+      if (alterou) {
+        salvarCabecalhos();
+        salvarRodapes();
+        salvarFormularios();
+        salvarPaginas();
+
+        renderizarResumoIntegrado();
+        mostrarAviso("🔄 Resumo sincronizado com o PMCD!");
+      }
+    } catch (e) {
+      console.error("Erro ao aplicar dados remotos do PMCD:", e);
+    }
+  }
+
+  function iniciarOuvintePMCDResumo() {
+    if (!pmcdSincAtiva || !dbPMCDRef) {
+      atualizarBadgePMCD(false, "⚠️ PMCD não configurado");
+      return;
+    }
+
+    try {
+      pmcdApp.database().ref(".info/connected").on("value", (snap) => {
+        const conectado = snap.val() === true;
+        atualizarBadgePMCD(conectado);
+      });
+    } catch (e) {}
+
+    // Ouvinte em tempo real (.on("value")) no nó andamento_quarteiroes/resumo_reconhecimento
+    dbPMCDRef.on("value", (snapshot) => {
+      const dados = snapshot.val();
+      if (!dados) return;
+
+      if (dados.timestamp && dados.timestamp === ultimoTimestampResumoLocal) {
+        return;
+      }
+
+      aplicarDadosRemotosPMCD(dados);
+    }, (err) => {
+      console.error("Erro no ouvinte PMCD:", err);
+      atualizarBadgePMCD(false, "⚡ PMCD Desconectado");
+    });
+  }
+
+  function sincronizarResumoPMCDAgora() {
+    if (!pmcdSincAtiva || !dbPMCDRef) {
+      mostrarAviso("⚠️ Firebase PMCD não configurado.");
+      return;
+    }
+    mostrarAviso("🔄 Sincronizando Resumo com PMCD...");
+    salvarResumoReconhecimentoPMCD();
+    dbPMCDRef.once("value").then((snapshot) => {
+      const dados = snapshot.val();
+      if (dados) {
+        aplicarDadosRemotosPMCD(dados);
+        mostrarAviso("✅ Resumo sincronizado com PMCD em tempo real!");
+      } else {
+        mostrarAviso("✅ Dados enviados ao PMCD!");
+      }
+    }).catch(err => {
+      console.error(err);
+      mostrarAviso("⚠️ Erro na sincronização com PMCD");
+    });
+  }
 
   function monitorarConexaoNuvem() {
     const badge = document.getElementById("statusNuvem");
@@ -3215,6 +3521,7 @@
         dadosFormularios[t][k][c] = inp.value;
         salvarFormularios();
         salvarComAtraso();
+        if (t === "resumo") salvarResumoReconhecimentoPMCDComAtraso();
       });
     });
     return table;
@@ -3232,6 +3539,7 @@
         cabecalhos[tipoInp][paginaInp][campoInp] = inp.value;
         salvarCabecalhos();
         salvarComAtraso();
+        if (tipoInp === "resumo") salvarResumoReconhecimentoPMCDComAtraso();
       };
     });
     document.querySelectorAll(".rodape-pagina input").forEach(inp => {
@@ -3245,6 +3553,7 @@
         rodapes[tipoInp][paginaInp][campoInp] = inp.value;
         salvarRodapes();
         salvarComAtraso();
+        if (tipoInp === "resumo") salvarResumoReconhecimentoPMCDComAtraso();
       };
     });
   }
@@ -3383,6 +3692,7 @@
           .then(() => mostrarAviso("☁️ Salvo e sincronizado na nuvem!"))
           .catch(err => { console.error(err); mostrarAviso("💾 Salvo localmente (offline)"); });
       } else { mostrarAviso("💾 Salvo automaticamente"); }
+      salvarResumoReconhecimentoPMCD();
     } catch (e) { mostrarAviso("⚠️ Erro ao salvar"); }
   }
 
@@ -3390,6 +3700,7 @@
     clearTimeout(timeoutSalvar);
     timeoutSalvar = setTimeout(() => {
       salvar();
+      salvarResumoReconhecimentoPMCD();
       if (!document.getElementById("painel-semanal").classList.contains("oculto")) atualizarResumoSemanal();
       if (!document.getElementById("painel-total").classList.contains("oculto")) atualizarTotalImoveis();
       if (!document.getElementById("painel-informados").classList.contains("oculto")) atualizarInformados();
@@ -3554,7 +3865,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `backup_diario_producao_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `backup_andamento_quarteiroes_${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     mostrarAviso("💾 Backup JSON exportado com sucesso!");
@@ -3903,7 +4214,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `diario_producao_${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `andamento_dos_quarteiroes_${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -3946,6 +4257,7 @@
   });
 
   monitorarConexaoNuvem();
+  iniciarOuvintePMCDResumo();
 </script>
 
 </body>
