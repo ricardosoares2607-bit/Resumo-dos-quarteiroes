@@ -161,6 +161,186 @@
   .tabela-dupla td.calculado { font-weight: bold; }
   .tabela-dupla td.vazio { color: #ccc; }
 
+  .tabela-dupla.com-liraa .col-num-linha { width: 10%; font-size: 8.5px; font-weight: bold; }
+  .tabela-dupla.com-liraa thead th.col-num-linha {
+    background: #1b5e20 !important;
+    color: #ffffff !important;
+    font-size: 8.5px !important;
+    font-weight: 900 !important;
+    padding: 3px 1px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .tabela-dupla.com-liraa .col-q { width: 19%; }
+  .tabela-dupla.com-liraa .col-n { width: 8.5%; }
+  .tabela-dupla.com-liraa .col-t { width: 12%; }
+  .tabela-dupla.com-liraa .col-liraa { width: 16.5%; font-weight: bold; background: #f1f8e9; }
+  .tabela-dupla.com-liraa thead th.col-liraa { background: #1b5e20; color: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .tabela-dupla.com-liraa tr.linha-total td.col-liraa { background: #1b5e20; color: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* Seleção clicável pela coluna Posição */
+  .col-posicao-clicavel {
+    cursor: pointer !important;
+    padding: 0 !important;
+    transition: background-color 0.15s ease-in-out;
+    user-select: none;
+  }
+  .col-posicao-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    width: 100%;
+    height: 100%;
+    min-height: 18px;
+    font-weight: bold;
+    font-size: 10px;
+    color: #333;
+    background: #f5f5f5;
+    transition: all 0.15s ease-in-out;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .col-posicao-clicavel:hover .col-posicao-btn {
+    background: #c8e6c9 !important;
+    color: #1b5e20 !important;
+    font-weight: 900;
+  }
+  /* Posição SELECIONADA */
+  .col-posicao-btn.ativo {
+    background: #1b5e20 !important;
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .col-posicao-btn .pos-check {
+    font-size: 9px;
+    font-weight: bold;
+    margin-right: 1px;
+  }
+  .col-posicao-clicavel:hover .col-posicao-btn.ativo {
+    background: #c62828 !important;
+    color: #ffffff !important;
+  }
+  tr.linha-liraa-selecionada {
+    background-color: #e8f5e9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  tr.linha-liraa-selecionada td.col-q {
+    font-weight: bold;
+    color: #1b5e20;
+  }
+  tr.linha-liraa-selecionada td.col-liraa {
+    background-color: #c8e6c9 !important;
+    color: #1b5e20 !important;
+    font-weight: 900;
+  }
+
+  /* Cartão de Resumo e Seletor de Visualização LIRAa */
+  .card-resumo-liraa {
+    background: #e8f5e9;
+    border: 1px solid #81c784;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+    font-size: 12px;
+  }
+  .card-resumo-liraa b { color: #1b5e20; }
+
+  .seletor-visualizacao-liraa {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 10px 0 15px;
+    flex-wrap: wrap;
+  }
+  .label-seletor-vis {
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+  }
+  .btn-vis-liraa {
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #444;
+    transition: all 0.2s;
+  }
+  .btn-vis-liraa:hover { background: #e0e0e0; }
+  .btn-vis-liraa.ativo {
+    background: #1b5e20;
+    color: #fff;
+    border-color: #1b5e20;
+  }
+
+  .titulo-secao-liraa {
+    background: #2e7d32;
+    color: #fff;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 6px;
+    margin: 15px 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    letter-spacing: 0.5px;
+  }
+  .titulo-secao-liraa.destaque-selecionados {
+    background: #1b5e20;
+    border-left: 6px solid #81c784;
+  }
+
+  /* Tabela Exclusiva para os Quarteirões Selecionados no LIRAa */
+  .tabela-liraa-exclusiva-wrapper {
+    margin-top: 10px;
+  }
+  .tabela-liraa-exclusiva {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    table-layout: fixed;
+  }
+  .tabela-liraa-exclusiva th, .tabela-liraa-exclusiva td {
+    border: 1px solid #333;
+    padding: 3px 2px;
+    text-align: center;
+    height: 22px;
+    line-height: 1.2;
+    overflow: hidden;
+    word-break: break-word;
+  }
+  .tabela-liraa-exclusiva thead th {
+    background: #1b5e20;
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold;
+  }
+  .tabela-liraa-exclusiva .col-pos { width: 9%; font-weight: bold; background: #e8f5e9; color: #1b5e20; }
+  .tabela-liraa-exclusiva .col-q { width: 21%; font-weight: bold; }
+  .tabela-liraa-exclusiva .col-n { width: 9%; }
+  .tabela-liraa-exclusiva .col-t { width: 12%; font-weight: bold; background: #f9f9f9; }
+  .tabela-liraa-exclusiva .col-liraa { width: 13%; font-weight: bold; background: #e8f5e9; color: #1b5e20; }
+  .tabela-liraa-exclusiva tr.linha-total td {
+    background: #1b5e20;
+    color: #fff;
+    font-weight: bold;
+  }
+
   .barra-botoes-tabelas { display: flex; justify-content: center; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
 
   .rodape-pagina { margin-top: 14px; padding-top: 10px; border-top: 1px solid #333; display: flex; justify-content: space-around; gap: 20px; flex-wrap: wrap; }
@@ -338,6 +518,24 @@
   .pdf-export-wrapper .tabela-dupla table { width: 100% !important; table-layout: fixed !important; font-size: 9.5px !important; box-sizing: border-box !important; }
   .pdf-export-wrapper .tabela-dupla th, .pdf-export-wrapper .tabela-dupla td { padding: 2px 1px !important; height: 18px !important; font-size: 9.5px !important; }
   .pdf-export-wrapper .tabela-dupla td input { font-size: 9.5px !important; }
+  .pdf-export-wrapper .tabela-dupla.com-liraa .col-num-linha { width: 7% !important; }
+  .pdf-export-wrapper .tabela-dupla.com-liraa .col-q { width: 22% !important; }
+  .pdf-export-wrapper .tabela-dupla.com-liraa .col-n { width: 8.5% !important; }
+  .pdf-export-wrapper .tabela-dupla.com-liraa .col-t { width: 12.5% !important; }
+  .pdf-export-wrapper .tabela-dupla.com-liraa .col-liraa {
+    width: 13% !important;
+    background: #f1f8e9 !important;
+    font-weight: bold !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .pdf-export-wrapper .tabela-dupla.com-liraa thead th.col-liraa,
+  .pdf-export-wrapper .tabela-dupla.com-liraa tr.linha-total td.col-liraa {
+    background: #1b5e20 !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 
   .pdf-export-wrapper .totais-quarteirao {
     margin: 0 0 5px !important;
@@ -449,6 +647,14 @@
 
     .tabela-resumo-integrada td.auto { background: #fff; }
     .tabela-resumo-integrada td.legacy { background: #fff; }
+
+    .tabela-dupla.com-liraa .col-num-linha { width: 7% !important; }
+    .tabela-dupla.com-liraa .col-q { width: 22% !important; }
+    .tabela-dupla.com-liraa .col-n { width: 8.5% !important; }
+    .tabela-dupla.com-liraa .col-t { width: 12.5% !important; }
+    .tabela-dupla.com-liraa .col-liraa { width: 13% !important; font-weight: bold !important; background: #f1f8e9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tabela-dupla.com-liraa thead th.col-liraa,
+    .tabela-dupla.com-liraa tr.linha-total td.col-liraa { background: #1b5e20 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
 </head>
@@ -473,6 +679,7 @@
   <button class="aba" data-aba="boletins" onclick="trocarAba('boletins')">📄 Boletins de Reconhecimento</button>
   <button class="aba" data-aba="resumo" onclick="trocarAba('resumo')">📑 Resumo de Reconhecimento</button>
   <button class="aba" data-aba="bases" onclick="trocarAba('bases')">🏢 Bases</button>
+  <button class="aba" data-aba="basesliraa" onclick="trocarAba('basesliraa')">🏢 Bases+LIRAa</button>
   <button class="aba" data-aba="coflagrados" onclick="trocarAba('coflagrados')">⚠️ Coflagrados</button>
   <button class="aba" data-aba="resumogeral" onclick="trocarAba('resumogeral')">📊 Resumo Geral</button>
 </div>
@@ -583,6 +790,48 @@
   <div id="tabelaBases"></div>
 </div>
 
+<div class="painel oculto" id="painel-basesliraa">
+  <div class="contador" id="contadorBasesLiraa"></div>
+  <div class="info-regra-bases">
+    📌 Esta aba possui o mesmo conteúdo de <b>Bases</b> (somente imóveis sem complemento) e adiciona a coluna <b>LIRAa</b> (imóveis visitados de 5 em 5: 1, 6, 11, etc.).<br>
+    <b>Seleção da Amostra:</b> Clique diretamente no número da coluna <b>Posição</b> para selecionar o quarteirão informado pela coordenação. Os quarteirões selecionados são reunidos automaticamente na tabela exclusiva abaixo.
+  </div>
+  <div class="barra-botoes-tabelas">
+    <button class="acao" onclick="adicionarPagina('basesliraa')">➕ Nova Dupla de Tabelas</button>
+    <button class="acao sucesso" onclick="gerarPDF('basesliraa')">📄 Gerar PDF (Geral)</button>
+    <button class="acao sucesso" onclick="gerarPDF('basesliraaselecionados')">📄 Gerar PDF (Selecionados LIRAa)</button>
+    <button class="acao" onclick="imprimir()">🖨️ Imprimir</button>
+    <button class="acao perigo" onclick="limparSelecaoLiraa()">🧹 Desmarcar Todos</button>
+  </div>
+
+  <div class="seletor-visualizacao-liraa no-print">
+    <span class="label-seletor-vis">Visualizar:</span>
+    <button type="button" class="btn-vis-liraa ativo" id="btnVisTodas" onclick="definirVisualizacaoLiraa('todas')">📑 Todas as Tabelas</button>
+    <button type="button" class="btn-vis-liraa" id="btnVisGeral" onclick="definirVisualizacaoLiraa('geral')">🏢 1. Tabela Geral (Seleção)</button>
+    <button type="button" class="btn-vis-liraa" id="btnVisSelecionados" onclick="definirVisualizacaoLiraa('selecionados')">🎯 2. Tabela Exclusiva LIRAa (<span id="badgeQtdLiraaSel">0</span>)</button>
+  </div>
+
+  <div id="cardResumoLiraa" class="card-resumo-liraa"></div>
+
+  <!-- 1. Tabela Geral de Bases + LIRAa -->
+  <div id="secaoBasesLiraaGeral">
+    <div class="titulo-secao-liraa">
+      <span>🏢 1. TABELA GERAL — BASES + LIRAa (Seleção por Quarteirão)</span>
+      <span style="font-size: 11px; font-weight: normal; opacity: 0.9;">Clique no número da Posição para selecionar</span>
+    </div>
+    <div id="tabelaBasesLiraa"></div>
+  </div>
+
+  <!-- 2. Tabela Exclusiva para os Quarteirões Selecionados no LIRAa -->
+  <div id="secaoBasesLiraaSelecionados" style="margin-top: 25px;">
+    <div class="titulo-secao-liraa destaque-selecionados">
+      <span>🎯 2. TABELA EXCLUSIVA — QUARTEIRÕES SELECIONADOS PARA O LIRAa</span>
+      <span style="font-size: 11px; font-weight: normal; opacity: 0.9;">Amostra Oficial da Coordenação</span>
+    </div>
+    <div id="tabelaLiraaSelecionados"></div>
+  </div>
+</div>
+
 <div class="painel oculto" id="painel-coflagrados">
   <div class="contador" id="contadorCoflagrados"></div>
   <div class="barra-botoes-tabelas">
@@ -626,15 +875,16 @@
   const STORAGE_RODAPES = "diario_rodapes_v1";
   const STORAGE_FORMULARIOS = "diario_formularios_novos_v1";
   const STORAGE_SELECAO_BOLETINS = "diario_boletins_selecao";
+  const STORAGE_LIRAA_SELECIONADOS = "diario_liraa_selecionados_v1";
 
   let semanaCount = 0;
   let timeoutSalvar = null;
   let ultimoTimestampLocal = 0;
 
   let statusQuarteiroes = {};
-  let paginas = { andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, coflagrados: 1, resumogeral: 1 };
-  let cabecalhos = { andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, coflagrados: {}, resumogeral: {} };
-  let rodapes = { andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, coflagrados: {}, resumogeral: {} };
+  let paginas = { andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, basesliraa: 1, coflagrados: 1, resumogeral: 1 };
+  let cabecalhos = { andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, basesliraa: {}, coflagrados: {}, resumogeral: {} };
+  let rodapes = { andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, basesliraa: {}, coflagrados: {}, resumogeral: {} };
   let dadosFormularios = { boletins: { porQuarteirao: {} }, resumo: {}, bases: {}, coflagrados: {} };
 
   let quarteiraoBoletinsSelecionado = (function() {
@@ -643,6 +893,25 @@
       return saved !== null ? saved : null;
     } catch (e) { return null; }
   })();
+
+  let quarteiroesLiraaSelecionados = (function() {
+    try {
+      const salvo = localStorage.getItem(STORAGE_LIRAA_SELECIONADOS);
+      if (salvo) {
+        const arr = JSON.parse(salvo);
+        if (Array.isArray(arr)) return new Set(arr.map(String));
+      }
+    } catch (e) {}
+    return new Set();
+  })();
+  let todasLinhasCacheBasesLiraa = [];
+  let visualizacaoLiraaAtual = "todas";
+
+  function salvarSelecaoLiraa() {
+    try {
+      localStorage.setItem(STORAGE_LIRAA_SELECIONADOS, JSON.stringify(Array.from(quarteiroesLiraaSelecionados)));
+    } catch (e) {}
+  }
 
   const CAMPOS_CABECALHO = [
     { id: "uf",          label: "Unid. Federal" },
@@ -727,6 +996,7 @@
     concluidos: "Resumo de Reconhecimento",
     resumo: "Resumo de Reconhecimento",
     bases: "Resumo de Reconhecimento - Bases",
+    basesliraa: "Resumo de Reconhecimento - Bases + LIRAa",
     coflagrados: "Resumo de Reconhecimento - Coflagrados",
     resumogeral: "Resumo de Reconhecimento - Geral"
   };
@@ -1071,12 +1341,17 @@
     try {
       if (!dados || !dados.semanas) return;
       statusQuarteiroes = dados.statusQuarteiroes || {};
-      paginas = Object.assign({ andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, coflagrados: 1, resumogeral: 1 }, dados.paginas);
-      cabecalhos = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, coflagrados: {}, resumogeral: {} }, dados.cabecalhos);
-      rodapes = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, coflagrados: {}, resumogeral: {} }, dados.rodapes);
+      paginas = Object.assign({ andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, basesliraa: 1, coflagrados: 1, resumogeral: 1 }, dados.paginas);
+      cabecalhos = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, basesliraa: {}, coflagrados: {}, resumogeral: {} }, dados.cabecalhos);
+      rodapes = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, basesliraa: {}, coflagrados: {}, resumogeral: {} }, dados.rodapes);
       dadosFormularios = Object.assign({ boletins: { porQuarteirao: {} }, resumo: {}, bases: {}, coflagrados: {} }, dados.dadosFormularios);
 
       garantirEstruturaBoletins();
+
+      if (dados.liraaSelecionados && Array.isArray(dados.liraaSelecionados)) {
+        quarteiroesLiraaSelecionados = new Set(dados.liraaSelecionados.map(String));
+        salvarSelecaoLiraa();
+      }
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(dados.semanas));
       salvarStatus(); salvarPaginas(); salvarCabecalhos(); salvarRodapes(); salvarFormularios();
@@ -1089,6 +1364,7 @@
       atualizarAndamento(); atualizarConcluidos(); renderizarFormularioBoletins();
       renderizarResumoIntegrado();
       renderizarBasesIntegrado();
+      renderizarBasesLiraaIntegrado();
       renderizarCoflagrados();
       renderizarResumoGeral();
 
@@ -1098,7 +1374,7 @@
 
   function trocarAba(nome) {
     document.querySelectorAll(".aba").forEach(b => b.classList.toggle("ativa", b.dataset.aba === nome));
-    ["diario", "semanal", "total", "informados", "andamento", "concluidos", "boletins", "resumo", "bases", "coflagrados", "resumogeral"].forEach(p => {
+    ["diario", "semanal", "total", "informados", "andamento", "concluidos", "boletins", "resumo", "bases", "basesliraa", "coflagrados", "resumogeral"].forEach(p => {
       const el = document.getElementById("painel-" + p);
       if (el) el.classList.toggle("oculto", p !== nome);
     });
@@ -1110,6 +1386,7 @@
     if (nome === "boletins") renderizarFormularioBoletins();
     if (nome === "resumo") renderizarResumoIntegrado();
     if (nome === "bases") renderizarBasesIntegrado();
+    if (nome === "basesliraa") renderizarBasesLiraaIntegrado();
     if (nome === "coflagrados") renderizarCoflagrados();
     if (nome === "resumogeral") renderizarResumoGeral();
   }
@@ -1980,19 +2257,23 @@
     return resultado;
   }
 
-  function criarTabelaResumoIntegrada(linhas, numInicial, badgeLabel) {
+  function criarTabelaResumoIntegrada(linhas, numInicial, badgeLabel, incluirLiraa = false) {
     const badge = badgeLabel !== undefined ? badgeLabel : "auto";
     const table = document.createElement("table");
-    table.className = "tabela-resumo-integrada";
+    table.className = "tabela-resumo-integrada" + (incluirLiraa ? " com-liraa" : "");
 
     const thead = document.createElement("thead");
     const trHead = document.createElement("tr");
-    ["Nº", "Quarteirão", "R", "C", "TB", "PE", "O", "Total"].forEach(col => {
+    const colunasHead = [incluirLiraa ? "Posição" : "Nº", "Quarteirão", "R", "C", "TB", "PE", "O", "Total"];
+    if (incluirLiraa) colunasHead.push("LIRAa");
+
+    colunasHead.forEach(col => {
       const th = document.createElement("th");
       th.textContent = col;
-      if (col === "Nº") th.className = "col-num-linha";
+      if (col === "Nº" || col === "Posição") th.className = "col-num-linha";
       else if (col === "Quarteirão") th.className = "col-q";
       else if (col === "Total") th.className = "col-t";
+      else if (col === "LIRAa") th.className = "col-liraa";
       else th.className = "col-n";
       trHead.appendChild(th);
     });
@@ -2000,7 +2281,7 @@
     table.appendChild(thead);
 
     const tbody = document.createElement("tbody");
-    const geral = { R: 0, C: 0, TB: 0, PE: 0, O: 0 };
+    const geral = { R: 0, C: 0, TB: 0, PE: 0, O: 0, liraa: 0 };
     let contagem = 0;
 
     for (let i = 0; i < LINHAS_DUPLA; i++) {
@@ -2012,12 +2293,27 @@
         contagem++;
         const R = linha.R || 0, C = linha.C || 0, TB = linha.TB || 0, PE = linha.PE || 0, O = linha.O || 0;
         const total = R + C + TB + PE + O;
-        geral.R += R; geral.C += C; geral.TB += TB; geral.PE += PE; geral.O += O;
+        const liraa = total > 0 ? (Math.floor((total - 1) / 5) + 1) : 0;
+        geral.R += R; geral.C += C; geral.TB += TB; geral.PE += PE; geral.O += O; geral.liraa += liraa;
+
+        const isSelecionado = incluirLiraa && quarteiroesLiraaSelecionados.has(String(linha.q));
+        if (isSelecionado) tr.classList.add("linha-liraa-selecionada");
 
         const clsOrigem = linha.tipo === "auto" ? "auto" : "legacy";
         const quartExibido = formatarIdentificador2Digitos(linha.q);
+
+        const tdPosicao = incluirLiraa ? `
+          <td class="col-num-linha col-posicao-clicavel" onclick="alternarSelecaoLiraa('${escapeAttr(linha.q)}')" title="${isSelecionado ? 'Clique para desmarcar a Posição ' + numeroLinha + ' (Quarteirão ' + escapeHtmlAttr(quartExibido) + ')' : 'Clique para selecionar a Posição ' + numeroLinha + ' (Quarteirão ' + escapeHtmlAttr(quartExibido) + ') para o LIRAa'}">
+            <div class="col-posicao-btn ${isSelecionado ? 'ativo' : ''}">
+              ${isSelecionado ? '<span class="pos-check">✓</span>' : ''}${numeroLinha}
+            </div>
+          </td>
+        ` : `<td class="col-num-linha">${numeroLinha}</td>`;
+
+        const tdLiraa = incluirLiraa ? `<td class="col-liraa calculado">${formatarInteiro2Digitos(liraa)}</td>` : "";
+
         tr.innerHTML = `
-          <td class="col-num-linha">${numeroLinha}</td>
+          ${tdPosicao}
           <td class="col-q ${clsOrigem}">${escapeHtmlAttr(quartExibido)}${linha.tipo === "auto" ? `<span class="badge-auto">${escapeHtmlAttr(badge)}</span>` : ''}</td>
           <td class="col-n calculado">${formatarInteiro2Digitos(R)}</td>
           <td class="col-n calculado">${formatarInteiro2Digitos(C)}</td>
@@ -2025,8 +2321,10 @@
           <td class="col-n calculado">${formatarInteiro2Digitos(PE)}</td>
           <td class="col-n calculado">${formatarInteiro2Digitos(O)}</td>
           <td class="col-t calculado">${formatarInteiro2Digitos(total)}</td>
+          ${tdLiraa}
         `;
       } else {
+        const tdLiraaVazio = incluirLiraa ? `<td class="col-liraa vazio"></td>` : "";
         tr.innerHTML = `
           <td class="col-num-linha">${numeroLinha}</td>
           <td class="col-q vazio"></td>
@@ -2036,6 +2334,7 @@
           <td class="col-n vazio"></td>
           <td class="col-n vazio"></td>
           <td class="col-t vazio"></td>
+          ${tdLiraaVazio}
         `;
       }
       tbody.appendChild(tr);
@@ -2044,6 +2343,7 @@
     const totalGeral = geral.R + geral.C + geral.TB + geral.PE + geral.O;
     const trTotal = document.createElement("tr");
     trTotal.className = "linha-total";
+    const tdLiraaTotal = incluirLiraa ? `<td class="col-liraa">${formatarInteiro2Digitos(geral.liraa)}</td>` : "";
     trTotal.innerHTML = `
       <td class="col-num-linha"></td>
       <td class="col-q">TOTAL</td>
@@ -2053,6 +2353,7 @@
       <td class="col-n">${formatarInteiro2Digitos(geral.PE)}</td>
       <td class="col-n">${formatarInteiro2Digitos(geral.O)}</td>
       <td class="col-t">${formatarInteiro2Digitos(totalGeral)}</td>
+      ${tdLiraaTotal}
     `;
     tbody.appendChild(trTotal);
 
@@ -2295,6 +2596,369 @@
     vincularEventosCabecalhoRodape();
   }
 
+  function renderizarBasesLiraaIntegrado() {
+    const container = document.getElementById("tabelaBasesLiraa");
+    if (!container) return;
+    container.innerHTML = "";
+
+    const basesBoletins = coletarBasesBoletins();
+    const quarteiroesB = Object.keys(basesBoletins).sort((a, b) => {
+      if (a === "_legacy") return 1;
+      if (b === "_legacy") return -1;
+      return a.localeCompare(b, "pt-BR", { numeric: true });
+    });
+
+    const setQ = new Set(quarteiroesB);
+
+    const legacy = [];
+    const seen = new Set();
+    const reg = dadosFormularios.bases || {};
+    Object.keys(reg).forEach(rowKey => {
+      const l = reg[rowKey] || {};
+      const q = String(l.q || "").trim();
+      if (!q) return;
+      if (setQ.has(q)) return;
+      if (seen.has(q)) return;
+      seen.add(q);
+      legacy.push({
+        q,
+        R: parseInt(l.r, 10) || 0,
+        C: parseInt(l.c, 10) || 0,
+        TB: parseInt(l.tb, 10) || 0,
+        PE: parseInt(l.pe, 10) || 0,
+        O: parseInt(l.o, 10) || 0
+      });
+    });
+    legacy.sort((a, b) => a.q.localeCompare(b.q, "pt-BR", { numeric: true }));
+
+    const todasLinhas = [];
+    let somaTotalLiraaGeral = 0;
+    quarteiroesB.forEach(q => {
+      const d = basesBoletins[q];
+      const tot = d.total !== undefined ? d.total : (d.R + d.C + d.TB + d.PE + d.O);
+      const liraa = tot > 0 ? (Math.floor((tot - 1) / 5) + 1) : 0;
+      somaTotalLiraaGeral += liraa;
+      todasLinhas.push({ q, tipo: "auto", R: d.R, C: d.C, TB: d.TB, PE: d.PE, O: d.O, total: tot, liraa });
+    });
+    legacy.forEach(e => {
+      const tot = e.R + e.C + e.TB + e.PE + e.O;
+      const liraa = tot > 0 ? (Math.floor((tot - 1) / 5) + 1) : 0;
+      somaTotalLiraaGeral += liraa;
+      todasLinhas.push({ q: e.q, tipo: "legacy", R: e.R, C: e.C, TB: e.TB, PE: e.PE, O: e.O, total: tot, liraa });
+    });
+
+    todasLinhas.forEach((linha, idx) => {
+      linha.posicao = formatarInteiro2Digitos(idx + 1);
+      linha.posicaoNum = idx + 1;
+    });
+    todasLinhasCacheBasesLiraa = todasLinhas;
+
+    if (todasLinhas.length === 0) {
+      container.innerHTML = `<div class="info-vazia">Nenhum quarteirão informado ainda.<br>Preencha os <b>Boletins de Reconhecimento</b> para que a aba Bases+LIRAa seja alimentada automaticamente (somente imóveis <b>sem complemento</b>).</div>`;
+      const cont = document.getElementById("contadorBasesLiraa");
+      if (cont) cont.textContent = "";
+      renderizarTabelaLiraaSelecionados([]);
+      atualizarCardResumoLiraa([]);
+      return;
+    }
+
+    const ROWS_PER_TABLE = LINHAS_DUPLA;
+    const ROWS_PER_PAGE = ROWS_PER_TABLE * 2;
+    const computedPaginas = Math.max(1, Math.ceil(todasLinhas.length / ROWS_PER_PAGE));
+    const numPaginas = Math.max(computedPaginas, paginas.basesliraa || 1);
+
+    const cont = document.getElementById("contadorBasesLiraa");
+    if (cont) {
+      cont.textContent = `${todasLinhas.length} quarteirão(ões) | ${somaTotalLiraaGeral} imóvel(is) no LIRAa | ${numPaginas} página(s)`;
+    }
+
+    for (let p = 0; p < numPaginas; p++) {
+      if (!cabecalhos.basesliraa) cabecalhos.basesliraa = {};
+      if (!cabecalhos.basesliraa[p] && cabecalhos.bases && cabecalhos.bases[p]) {
+        cabecalhos.basesliraa[p] = { ...cabecalhos.bases[p] };
+      }
+      if (!rodapes.basesliraa) rodapes.basesliraa = {};
+      if (!rodapes.basesliraa[p] && rodapes.bases && rodapes.bases[p]) {
+        rodapes.basesliraa[p] = { ...rodapes.bases[p] };
+      }
+
+      const divPagina = document.createElement("div");
+      divPagina.className = "pagina-a4";
+
+      const divTitulo = document.createElement("div");
+      divTitulo.className = "titulo-pagina";
+      divTitulo.textContent = `Página ${p + 1} de ${numPaginas}`;
+      divPagina.appendChild(divTitulo);
+
+      const hTitulo = document.createElement("div");
+      hTitulo.className = "titulo-principal";
+      hTitulo.textContent = TITULO_PRINCIPAL;
+      divPagina.appendChild(hTitulo);
+
+      const hSub = document.createElement("div");
+      hSub.className = "subtitulo";
+      hSub.textContent = SUBTITULOS.basesliraa || "Resumo de Reconhecimento - Bases + LIRAa";
+      divPagina.appendChild(hSub);
+
+      const cabecalho = criarCabecalho("basesliraa", p);
+      divPagina.appendChild(cabecalho);
+
+      const divDupla = document.createElement("div");
+      divDupla.className = "dupla-tabelas";
+
+      const offset = p * ROWS_PER_PAGE;
+      const linhasT1 = todasLinhas.slice(offset, offset + ROWS_PER_TABLE);
+      const linhasT2 = todasLinhas.slice(offset + ROWS_PER_TABLE, offset + ROWS_PER_PAGE);
+
+      const divT1 = document.createElement("div");
+      divT1.className = "tabela-dupla com-liraa";
+      const t1 = criarTabelaResumoIntegrada(linhasT1, offset + 1, "sem comp.", true);
+      divT1.appendChild(t1);
+
+      const divT2 = document.createElement("div");
+      divT2.className = "tabela-dupla com-liraa";
+      const t2 = criarTabelaResumoIntegrada(linhasT2, offset + ROWS_PER_TABLE + 1, "sem comp.", true);
+      divT2.appendChild(t2);
+
+      divDupla.appendChild(divT1);
+      divDupla.appendChild(divT2);
+      divPagina.appendChild(divDupla);
+
+      const totalQ = (parseInt(t1.dataset.contagem) || 0) + (parseInt(t2.dataset.contagem) || 0);
+      const spanTotal = cabecalho.querySelector(`[data-total-quarteiroes="basesliraa-${p}"]`);
+      if (spanTotal) spanTotal.textContent = totalQ;
+
+      const rodape = criarRodape("basesliraa", p);
+      divPagina.appendChild(rodape);
+
+      container.appendChild(divPagina);
+    }
+
+    vincularEventosCabecalhoRodape();
+    renderizarTabelaLiraaSelecionados(todasLinhas);
+    atualizarCardResumoLiraa(todasLinhas);
+    aplicarVisualizacaoLiraa();
+  }
+
+  function alternarSelecaoLiraa(q, forcarEstado) {
+    const qStr = String(q);
+    const novoEstado = (typeof forcarEstado === "boolean") ? forcarEstado : !quarteiroesLiraaSelecionados.has(qStr);
+
+    if (novoEstado) {
+      quarteiroesLiraaSelecionados.add(qStr);
+    } else {
+      quarteiroesLiraaSelecionados.delete(qStr);
+    }
+    salvarSelecaoLiraa();
+    salvar();
+
+    renderizarBasesLiraaIntegrado();
+  }
+
+  function limparSelecaoLiraa() {
+    if (quarteiroesLiraaSelecionados.size === 0) {
+      mostrarAviso("Nenhum quarteirão selecionado no LIRAa.");
+      return;
+    }
+    if (!confirm(`Deseja desmarcar todos os ${quarteiroesLiraaSelecionados.size} quarteirões selecionados para o LIRAa?`)) return;
+    quarteiroesLiraaSelecionados.clear();
+    salvarSelecaoLiraa();
+    salvar();
+    renderizarBasesLiraaIntegrado();
+    mostrarAviso("🧹 Todos os quarteirões foram desmarcados do LIRAa.");
+  }
+
+  function definirVisualizacaoLiraa(modo) {
+    visualizacaoLiraaAtual = modo;
+    aplicarVisualizacaoLiraa();
+  }
+
+  function aplicarVisualizacaoLiraa() {
+    const modo = visualizacaoLiraaAtual || "todas";
+    const secGeral = document.getElementById("secaoBasesLiraaGeral");
+    const secSel = document.getElementById("secaoBasesLiraaSelecionados");
+    const btnTodas = document.getElementById("btnVisTodas");
+    const btnGeral = document.getElementById("btnVisGeral");
+    const btnSel = document.getElementById("btnVisSelecionados");
+
+    if (btnTodas) btnTodas.classList.toggle("ativo", modo === "todas");
+    if (btnGeral) btnGeral.classList.toggle("ativo", modo === "geral");
+    if (btnSel) btnSel.classList.toggle("ativo", modo === "selecionados");
+
+    if (secGeral) secGeral.style.display = (modo === "selecionados") ? "none" : "";
+    if (secSel) secSel.style.display = (modo === "geral") ? "none" : "";
+  }
+
+  function atualizarCardResumoLiraa(todasLinhas) {
+    const card = document.getElementById("cardResumoLiraa");
+    const badge = document.getElementById("badgeQtdLiraaSel");
+    if (!card) return;
+
+    const lista = todasLinhas || todasLinhasCacheBasesLiraa || [];
+    const selecionadas = lista.filter(l => quarteiroesLiraaSelecionados.has(String(l.q)));
+
+    if (badge) badge.textContent = selecionadas.length;
+
+    let somaTotaisSel = 0;
+    let somaLiraaSel = 0;
+    selecionadas.forEach(l => {
+      somaTotaisSel += (l.total || 0);
+      somaLiraaSel += (l.liraa || 0);
+    });
+
+    if (selecionadas.length === 0) {
+      card.innerHTML = `
+        <div style="flex: 1;">
+          🎯 <b>Amostra LIRAa:</b> Nenhum quarteirão selecionado ainda.
+          <span style="color: #555; font-size: 11px; margin-left: 6px;">(Clique no número da coluna <b>Posição</b> dos quarteirões definidos pela coordenação)</span>
+        </div>
+        <div style="font-size: 11px; color: #777;">0 quarteirões selecionados</div>
+      `;
+    } else {
+      const posicoesStr = selecionadas.map(s => s.posicao).join(", ");
+      card.innerHTML = `
+        <div>
+          🎯 <b>Amostra LIRAa Selecionada:</b>
+          <span><b>${selecionadas.length}</b> quarteirão(ões)</span> |
+          <span><b>${formatarInteiro2Digitos(somaTotaisSel)}</b> imóveis totais</span> |
+          <span><b>${formatarInteiro2Digitos(somaLiraaSel)}</b> imóveis a visitar no LIRAa</span>
+        </div>
+        <div style="font-size: 11px; color: #1b5e20;">
+          Posições selecionadas: <b>${escapeHtmlAttr(posicoesStr)}</b>
+        </div>
+      `;
+    }
+  }
+
+  function renderizarTabelaLiraaSelecionados(todasLinhas) {
+    const container = document.getElementById("tabelaLiraaSelecionados");
+    if (!container) return;
+    container.innerHTML = "";
+
+    const lista = todasLinhas || todasLinhasCacheBasesLiraa || [];
+    const selecionadas = lista.filter(l => quarteiroesLiraaSelecionados.has(String(l.q)));
+
+    if (selecionadas.length === 0) {
+      container.innerHTML = `
+        <div class="info-vazia" style="padding: 24px 15px; background: #fafafa; border: 1px dashed #4caf50; border-radius: 6px; margin: 10px 0;">
+          🎯 <b>Nenhum quarteirão selecionado para o LIRAa no momento.</b><br>
+          Clique diretamente no número da coluna <b>Posição</b> na tabela geral acima para incluir os quarteirões definidos pela coordenação.
+        </div>
+      `;
+      return;
+    }
+
+    const ROWS_PER_PAGE_SEL = 26;
+    const numPaginasSel = Math.ceil(selecionadas.length / ROWS_PER_PAGE_SEL) || 1;
+
+    let somaGeral = { R: 0, C: 0, TB: 0, PE: 0, O: 0, total: 0, liraa: 0 };
+    selecionadas.forEach(l => {
+      somaGeral.R += (l.R || 0);
+      somaGeral.C += (l.C || 0);
+      somaGeral.TB += (l.TB || 0);
+      somaGeral.PE += (l.PE || 0);
+      somaGeral.O += (l.O || 0);
+      somaGeral.total += (l.total || 0);
+      somaGeral.liraa += (l.liraa || 0);
+    });
+
+    for (let p = 0; p < numPaginasSel; p++) {
+      const divPagina = document.createElement("div");
+      divPagina.className = "pagina-a4";
+
+      const divTitulo = document.createElement("div");
+      divTitulo.className = "titulo-pagina";
+      divTitulo.textContent = `Página ${p + 1} de ${numPaginasSel} — Quarteirões Selecionados para o LIRAa`;
+      divPagina.appendChild(divTitulo);
+
+      const hTitulo = document.createElement("div");
+      hTitulo.className = "titulo-principal";
+      hTitulo.textContent = TITULO_PRINCIPAL;
+      divPagina.appendChild(hTitulo);
+
+      const hSub = document.createElement("div");
+      hSub.className = "subtitulo";
+      hSub.textContent = "Quarteirões Selecionados para o LIRAa — Amostra Oficial da Coordenação";
+      divPagina.appendChild(hSub);
+
+      const cabecalho = criarCabecalho("basesliraa", p, null, { mostrarTotal: true });
+      divPagina.appendChild(cabecalho);
+
+      const spanTotal = cabecalho.querySelector(`[data-total-quarteiroes="basesliraa-${p}"]`);
+      if (spanTotal) spanTotal.textContent = `${selecionadas.length} (selecionados)`;
+
+      const wrapperTabela = document.createElement("div");
+      wrapperTabela.className = "tabela-liraa-exclusiva-wrapper";
+
+      const table = document.createElement("table");
+      table.className = "tabela-liraa-exclusiva";
+
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th class="col-pos">Posição</th>
+          <th class="col-q">Quarteirão</th>
+          <th class="col-n">R</th>
+          <th class="col-n">C</th>
+          <th class="col-n">TB</th>
+          <th class="col-n">PE</th>
+          <th class="col-n">O</th>
+          <th class="col-t">Total</th>
+          <th class="col-liraa">LIRAa</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      const fatiasLinhas = selecionadas.slice(p * ROWS_PER_PAGE_SEL, (p + 1) * ROWS_PER_PAGE_SEL);
+
+      fatiasLinhas.forEach(l => {
+        const tr = document.createElement("tr");
+        const quartExibido = formatarIdentificador2Digitos(l.q);
+        tr.innerHTML = `
+          <td class="col-pos col-posicao-clicavel" onclick="alternarSelecaoLiraa('${escapeAttr(l.q)}', false)" title="Clique para desmarcar e remover o Quarteirão ${escapeHtmlAttr(quartExibido)} do LIRAa">
+            <div class="col-posicao-btn ativo"><span class="pos-check">✓</span>${l.posicao || ""}</div>
+          </td>
+          <td class="col-q">${escapeHtmlAttr(quartExibido)}</td>
+          <td class="col-n">${formatarInteiro2Digitos(l.R)}</td>
+          <td class="col-n">${formatarInteiro2Digitos(l.C)}</td>
+          <td class="col-n">${formatarInteiro2Digitos(l.TB)}</td>
+          <td class="col-n">${formatarInteiro2Digitos(l.PE)}</td>
+          <td class="col-n">${formatarInteiro2Digitos(l.O)}</td>
+          <td class="col-t">${formatarInteiro2Digitos(l.total)}</td>
+          <td class="col-liraa calculado">${formatarInteiro2Digitos(l.liraa)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (p === numPaginasSel - 1) {
+        const trTotal = document.createElement("tr");
+        trTotal.className = "linha-total";
+        trTotal.innerHTML = `
+          <td class="col-pos"></td>
+          <td class="col-q">TOTAL (${selecionadas.length} Q)</td>
+          <td class="col-n">${formatarInteiro2Digitos(somaGeral.R)}</td>
+          <td class="col-n">${formatarInteiro2Digitos(somaGeral.C)}</td>
+          <td class="col-n">${formatarInteiro2Digitos(somaGeral.TB)}</td>
+          <td class="col-n">${formatarInteiro2Digitos(somaGeral.PE)}</td>
+          <td class="col-n">${formatarInteiro2Digitos(somaGeral.O)}</td>
+          <td class="col-t">${formatarInteiro2Digitos(somaGeral.total)}</td>
+          <td class="col-liraa">${formatarInteiro2Digitos(somaGeral.liraa)}</td>
+        `;
+        tbody.appendChild(trTotal);
+      }
+
+      table.appendChild(tbody);
+      wrapperTabela.appendChild(table);
+      divPagina.appendChild(wrapperTabela);
+
+      const rodape = criarRodape("basesliraa", p);
+      divPagina.appendChild(rodape);
+
+      container.appendChild(divPagina);
+    }
+  }
+
   function renderizarResumoGeral() {
     const container = document.getElementById("tabelaResumoGeral");
     if (!container) return;
@@ -2388,6 +3052,7 @@
   function renderizarFormularioGenerico(tipo) {
     if (tipo === "resumo") return renderizarResumoIntegrado();
     if (tipo === "bases") return renderizarBasesIntegrado();
+    if (tipo === "basesliraa") return renderizarBasesLiraaIntegrado();
     if (tipo === "coflagrados") return renderizarCoflagrados();
     if (tipo === "resumogeral") return renderizarResumoGeral();
   }
@@ -3598,6 +4263,7 @@
     else if (tipo === "concluidos") atualizarConcluidos();
     else if (tipo === "resumo") renderizarResumoIntegrado();
     else if (tipo === "bases") renderizarBasesIntegrado();
+    else if (tipo === "basesliraa") renderizarBasesLiraaIntegrado();
     else if (tipo === "coflagrados") renderizarCoflagrados();
     else if (tipo === "resumogeral") renderizarResumoGeral();
     else renderizarFormularioGenerico(tipo);
@@ -3607,21 +4273,21 @@
   function carregarPaginas() {
     try {
       const dados = localStorage.getItem(STORAGE_PAGINAS);
-      if (dados) paginas = Object.assign({ andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, coflagrados: 1, resumogeral: 1 }, JSON.parse(dados));
+      if (dados) paginas = Object.assign({ andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, basesliraa: 1, coflagrados: 1, resumogeral: 1 }, JSON.parse(dados));
     } catch (e) {}
   }
   function salvarCabecalhos() { try { localStorage.setItem(STORAGE_CABECALHOS, JSON.stringify(cabecalhos)); } catch (e) {} }
   function carregarCabecalhos() {
     try {
       const dados = localStorage.getItem(STORAGE_CABECALHOS);
-      if (dados) cabecalhos = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, coflagrados: {}, resumogeral: {} }, JSON.parse(dados));
+      if (dados) cabecalhos = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, basesliraa: {}, coflagrados: {}, resumogeral: {} }, JSON.parse(dados));
     } catch (e) {}
   }
   function salvarRodapes() { try { localStorage.setItem(STORAGE_RODAPES, JSON.stringify(rodapes)); } catch (e) {} }
   function carregarRodapes() {
     try {
       const dados = localStorage.getItem(STORAGE_RODAPES);
-      if (dados) rodapes = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, coflagrados: {}, resumogeral: {} }, JSON.parse(dados));
+      if (dados) rodapes = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, basesliraa: {}, coflagrados: {}, resumogeral: {} }, JSON.parse(dados));
     } catch (e) {}
   }
   function salvarFormularios() { try { localStorage.setItem(STORAGE_FORMULARIOS, JSON.stringify(dadosFormularios)); } catch (e) {} }
@@ -3700,7 +4366,8 @@
         ultimoTimestampLocal = agora;
         const payload = {
           timestamp: agora, semanas: semanas, statusQuarteiroes: statusQuarteiroes,
-          paginas: paginas, cabecalhos: cabecalhos, rodapes: rodapes, dadosFormularios: dadosFormularios
+          paginas: paginas, cabecalhos: cabecalhos, rodapes: rodapes, dadosFormularios: dadosFormularios,
+          liraaSelecionados: Array.from(quarteiroesLiraaSelecionados)
         };
         dbRef.set(payload)
           .then(() => mostrarAviso("☁️ Salvo e sincronizado na nuvem!"))
@@ -3722,6 +4389,7 @@
       if (!document.getElementById("painel-concluidos").classList.contains("oculto")) atualizarConcluidos();
       if (!document.getElementById("painel-resumo").classList.contains("oculto")) renderizarResumoIntegrado();
       if (!document.getElementById("painel-bases").classList.contains("oculto")) renderizarBasesIntegrado();
+      if (!document.getElementById("painel-basesliraa").classList.contains("oculto")) renderizarBasesLiraaIntegrado();
       if (!document.getElementById("painel-resumogeral").classList.contains("oculto")) renderizarResumoGeral();
     }, 400);
   }
@@ -3764,7 +4432,11 @@
       const o = origInputs[i];
       const c = cloneInputs[i];
       if (o && c) {
-        if (o.tagName === "SELECT") {
+        if (o.type === "checkbox") {
+          c.checked = o.checked;
+          if (o.checked) c.setAttribute("checked", "checked");
+          else c.removeAttribute("checked");
+        } else if (o.tagName === "SELECT") {
           c.value = o.value;
         } else if (o.tagName === "TEXTAREA") {
           c.value = o.value;
@@ -3804,7 +4476,7 @@
     clone.querySelectorAll(".bloco-quarteirao").forEach(b => b.classList.remove("oculto-por-selecao"));
 
     // Remove botões de ação e elementos interativos da folha de PDF
-    clone.querySelectorAll(".btn-status-mini, .barra-botoes-quarteirao, .titulo-bloco-quarteirao, .barra-botoes-tabelas, .barra-filtro, .aviso-sincronizacao, .barra-selecao-quarteirao, .legenda-codigos, .legenda-colagem").forEach(el => el.remove());
+    clone.querySelectorAll(".btn-status-mini, .barra-botoes-quarteirao, .titulo-bloco-quarteirao, .barra-botoes-tabelas, .barra-filtro, .aviso-sincronizacao, .barra-selecao-quarteirao, .legenda-codigos, .legenda-colagem, .seletor-visualizacao-liraa, .card-resumo-liraa").forEach(el => el.remove());
 
     wrapper.appendChild(clone);
     document.body.appendChild(wrapper);
@@ -3850,12 +4522,19 @@
       boletins: "tabelaBoletins",
       resumo: "tabelaResumo",
       bases: "tabelaBases",
+      basesliraa: "tabelaBasesLiraa",
+      basesliraaselecionados: "tabelaLiraaSelecionados",
       coflagrados: "tabelaCoflagrados",
       resumogeral: "tabelaResumoGeral",
       semanal: "semanasResumo",
       total: "tabelaTotalImoveis",
       informados: "tabelaInformados"
     };
+
+    if (tipo === "basesliraaselecionados" && quarteiroesLiraaSelecionados.size === 0) {
+      alert("Nenhum quarteirão selecionado para o LIRAa para gerar o PDF.");
+      return;
+    }
 
     const id = idMapa[tipo];
     const el = document.getElementById(id);
@@ -3871,9 +4550,10 @@
 
   function exportarBackupJSON() {
     const backup = {
-      versao: "3.4", dataBackup: new Date().toISOString(),
+      versao: "3.5", dataBackup: new Date().toISOString(),
       semanas: coletarDados(), statusQuarteiroes: statusQuarteiroes,
-      paginas: paginas, cabecalhos: cabecalhos, rodapes: rodapes, dadosFormularios: dadosFormularios
+      paginas: paginas, cabecalhos: cabecalhos, rodapes: rodapes, dadosFormularios: dadosFormularios,
+      liraaSelecionados: Array.from(quarteiroesLiraaSelecionados)
     };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -3898,12 +4578,19 @@
         if (!confirm("⚠️ Atenção: A restauração do backup substituirá os dados atuais. Deseja continuar?")) { event.target.value = ""; return; }
         const semanas = dados.semanas || dados;
         statusQuarteiroes = dados.statusQuarteiroes || {};
-        paginas = Object.assign({ andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, coflagrados: 1, resumogeral: 1 }, dados.paginas);
-        cabecalhos = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, coflagrados: {}, resumogeral: {} }, dados.cabecalhos);
-        rodapes = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, coflagrados: {}, resumogeral: {} }, dados.rodapes);
+        paginas = Object.assign({ andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, basesliraa: 1, coflagrados: 1, resumogeral: 1 }, dados.paginas);
+        cabecalhos = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, basesliraa: {}, coflagrados: {}, resumogeral: {} }, dados.cabecalhos);
+        rodapes = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, basesliraa: {}, coflagrados: {}, resumogeral: {} }, dados.rodapes);
         dadosFormularios = Object.assign({ boletins: { porQuarteirao: {} }, resumo: {}, bases: {}, coflagrados: {} }, dados.dadosFormularios);
         if (!dadosFormularios.boletins) dadosFormularios.boletins = { porQuarteirao: {} };
         if (!dadosFormularios.coflagrados) dadosFormularios.coflagrados = {};
+
+        if (dados.liraaSelecionados && Array.isArray(dados.liraaSelecionados)) {
+          quarteiroesLiraaSelecionados = new Set(dados.liraaSelecionados.map(String));
+        } else {
+          quarteiroesLiraaSelecionados = new Set();
+        }
+        salvarSelecaoLiraa();
 
         garantirEstruturaBoletins();
 
@@ -3918,6 +4605,7 @@
         atualizarAndamento(); atualizarConcluidos(); renderizarFormularioBoletins();
         renderizarResumoIntegrado();
         renderizarBasesIntegrado();
+        renderizarBasesLiraaIntegrado();
         renderizarCoflagrados();
         renderizarResumoGeral();
 
@@ -4024,11 +4712,13 @@
     localStorage.removeItem(STORAGE_RODAPES);
     localStorage.removeItem(STORAGE_FORMULARIOS);
     localStorage.removeItem(STORAGE_SELECAO_BOLETINS);
+    localStorage.removeItem(STORAGE_LIRAA_SELECIONADOS);
     statusQuarteiroes = {};
-    cabecalhos = { andamento: {}, concluidos: {}, boletins: { porQuarteirao: {} }, resumo: {}, bases: {}, coflagrados: {}, resumogeral: {} };
-    rodapes = { andamento: {}, concluidos: {}, boletins: { porQuarteirao: {} }, resumo: {}, bases: {}, coflagrados: {}, resumogeral: {} };
+    quarteiroesLiraaSelecionados = new Set();
+    cabecalhos = { andamento: {}, concluidos: {}, boletins: { porQuarteirao: {} }, resumo: {}, bases: {}, basesliraa: {}, coflagrados: {}, resumogeral: {} };
+    rodapes = { andamento: {}, concluidos: {}, boletins: { porQuarteirao: {} }, resumo: {}, bases: {}, basesliraa: {}, coflagrados: {}, resumogeral: {} };
     dadosFormularios = { boletins: { porQuarteirao: {} }, resumo: {}, bases: {}, coflagrados: {} };
-    paginas = { andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, coflagrados: 1, resumogeral: 1 };
+    paginas = { andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, basesliraa: 1, coflagrados: 1, resumogeral: 1 };
     quarteiraoBoletinsSelecionado = null;
     document.getElementById("semanas").innerHTML = "";
     semanaCount = 0;
@@ -4038,6 +4728,7 @@
     atualizarAndamento(); atualizarConcluidos(); renderizarFormularioBoletins();
     renderizarResumoIntegrado();
     renderizarBasesIntegrado();
+    renderizarBasesLiraaIntegrado();
     renderizarCoflagrados();
     renderizarResumoGeral();
   }
@@ -4193,6 +4884,50 @@
       csv += `"TOTAL",${g.R},${g.C},${g.TB},${g.PE},${g.O},${g.Total}\n`;
     }
 
+    csv += "\n\n=== BASES + LIRAa (auto dos Boletins - de 5 em 5 imóveis: 1, 6, 11...) ===\n\n";
+    {
+      const bases = coletarBasesBoletins();
+      const chaves = Object.keys(bases).sort((a, b) => {
+        if (a === "_legacy") return 1;
+        if (b === "_legacy") return -1;
+        return a.localeCompare(b, "pt-BR", { numeric: true });
+      });
+      csv += "Posição,Quarteirão,R,C,TB,PE,O,Total,LIRAa,Selecionado LIRAa\n";
+      const g = { R: 0, C: 0, TB: 0, PE: 0, O: 0, Total: 0, LIRAa: 0 };
+      chaves.forEach((q, idx) => {
+        const d = bases[q];
+        const tot = d.total !== undefined ? d.total : (d.R + d.C + d.TB + d.PE + d.O);
+        const liraa = tot > 0 ? (Math.floor((tot - 1) / 5) + 1) : 0;
+        const sel = quarteiroesLiraaSelecionados.has(String(q)) ? "SIM" : "NÃO";
+        g.R += d.R; g.C += d.C; g.TB += d.TB; g.PE += d.PE; g.O += d.O; g.Total += tot; g.LIRAa += liraa;
+        csv += `${String(idx + 1).padStart(2, "0")},"${q === "_legacy" ? "(legado)" : q}",${d.R},${d.C},${d.TB},${d.PE},${d.O},${tot},${liraa},${sel}\n`;
+      });
+      csv += `"","TOTAL",${g.R},${g.C},${g.TB},${g.PE},${g.O},${g.Total},${g.LIRAa},""\n`;
+    }
+
+    csv += "\n\n=== QUARTEIRÕES SELECIONADOS PARA O LIRAA (Amostra Oficial da Coordenação) ===\n\n";
+    {
+      const bases = coletarBasesBoletins();
+      const chaves = Object.keys(bases).sort((a, b) => {
+        if (a === "_legacy") return 1;
+        if (b === "_legacy") return -1;
+        return a.localeCompare(b, "pt-BR", { numeric: true });
+      });
+      csv += "Posição,Quarteirão,R,C,TB,PE,O,Total,LIRAa\n";
+      const gSel = { R: 0, C: 0, TB: 0, PE: 0, O: 0, Total: 0, LIRAa: 0, count: 0 };
+      chaves.forEach((q, idx) => {
+        if (quarteiroesLiraaSelecionados.has(String(q))) {
+          const d = bases[q];
+          const tot = d.total !== undefined ? d.total : (d.R + d.C + d.TB + d.PE + d.O);
+          const liraa = tot > 0 ? (Math.floor((tot - 1) / 5) + 1) : 0;
+          gSel.count++;
+          gSel.R += d.R; gSel.C += d.C; gSel.TB += d.TB; gSel.PE += d.PE; gSel.O += d.O; gSel.Total += tot; gSel.LIRAa += liraa;
+          csv += `${String(idx + 1).padStart(2, "0")},"${q === "_legacy" ? "(legado)" : q}",${d.R},${d.C},${d.TB},${d.PE},${d.O},${tot},${liraa}\n`;
+        }
+      });
+      csv += `"","TOTAL (${gSel.count} Q)",${gSel.R},${gSel.C},${gSel.TB},${gSel.PE},${gSel.O},${gSel.Total},${gSel.LIRAa}\n`;
+    }
+
     csv += "\n\n=== RESUMO GERAL (Boletins + Coflagrados) ===\n\n";
     {
       const gerais = coletarResumosGerais();
@@ -4254,6 +4989,7 @@
   renderizarFormularioBoletins();
   renderizarResumoIntegrado();
   renderizarBasesIntegrado();
+  renderizarBasesLiraaIntegrado();
   renderizarCoflagrados();
   renderizarResumoGeral();
 
