@@ -456,6 +456,413 @@
     vertical-align: middle;
   }
 
+  /* ==========================================================================
+     OTIMIZAÇÕES RESPONSIVAS E VISUAIS PARA AS TABELAS ESPECÍFICAS:
+     - Boletim de Reconhecimento (#painel-boletins)
+     - Resumo de Reconhecimento  (#painel-resumo)
+     - Bases                     (#painel-bases)
+     - Bases+LIRAa               (#painel-basesliraa)
+     - Conflagrados              (#painel-coflagrados)
+     - Resumo Geral              (#painel-resumogeral)
+     ========================================================================== */
+
+  /* Contêiner com rolagem horizontal suave e barra de rolagem estilizada */
+  #painel-boletins .tabela-dupla,
+  #painel-resumo .tabela-dupla,
+  #painel-bases .tabela-dupla,
+  #painel-basesliraa .tabela-dupla,
+  #painel-basesliraa .tabela-liraa-exclusiva-wrapper,
+  #painel-coflagrados .tabela-dupla,
+  #painel-resumogeral .tabela-dupla {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #a5d6a7 #f5f5f5;
+  }
+  #painel-boletins .tabela-dupla::-webkit-scrollbar,
+  #painel-resumo .tabela-dupla::-webkit-scrollbar,
+  #painel-bases .tabela-dupla::-webkit-scrollbar,
+  #painel-basesliraa .tabela-dupla::-webkit-scrollbar,
+  #painel-basesliraa .tabela-liraa-exclusiva-wrapper::-webkit-scrollbar,
+  #painel-coflagrados .tabela-dupla::-webkit-scrollbar,
+  #painel-resumogeral .tabela-dupla::-webkit-scrollbar {
+    height: 6px;
+  }
+  #painel-boletins .tabela-dupla::-webkit-scrollbar-track,
+  #painel-resumo .tabela-dupla::-webkit-scrollbar-track,
+  #painel-bases .tabela-dupla::-webkit-scrollbar-track,
+  #painel-basesliraa .tabela-dupla::-webkit-scrollbar-track,
+  #painel-basesliraa .tabela-liraa-exclusiva-wrapper::-webkit-scrollbar-track,
+  #painel-coflagrados .tabela-dupla::-webkit-scrollbar-track,
+  #painel-resumogeral .tabela-dupla::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 3px;
+  }
+  #painel-boletins .tabela-dupla::-webkit-scrollbar-thumb,
+  #painel-resumo .tabela-dupla::-webkit-scrollbar-thumb,
+  #painel-bases .tabela-dupla::-webkit-scrollbar-thumb,
+  #painel-basesliraa .tabela-dupla::-webkit-scrollbar-thumb,
+  #painel-basesliraa .tabela-liraa-exclusiva-wrapper::-webkit-scrollbar-thumb,
+  #painel-coflagrados .tabela-dupla::-webkit-scrollbar-thumb,
+  #painel-resumogeral .tabela-dupla::-webkit-scrollbar-thumb {
+    background: #a5d6a7;
+    border-radius: 3px;
+  }
+
+  /* Cabeçalho fixo no topo ao rolar verticalmente na tela */
+  #painel-boletins .tabela-dupla thead th,
+  #painel-resumo .tabela-dupla thead th,
+  #painel-bases .tabela-dupla thead th,
+  #painel-basesliraa .tabela-dupla thead th,
+  #painel-basesliraa .tabela-liraa-exclusiva thead th,
+  #painel-coflagrados .tabela-dupla thead th,
+  #painel-resumogeral .tabela-dupla thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+  }
+
+  /* Coluna Posição / Nº fixada à esquerda na rolagem horizontal para facilitar navegação */
+  #painel-resumo .tabela-dupla td.col-num-linha,
+  #painel-bases .tabela-dupla td.col-num-linha,
+  #painel-basesliraa .tabela-dupla td.col-num-linha,
+  #painel-basesliraa .tabela-liraa-exclusiva td.col-pos,
+  #painel-coflagrados .tabela-dupla td.col-num-linha,
+  #painel-resumogeral .tabela-dupla td.col-num-linha {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #f5f5f5;
+  }
+  #painel-resumo .tabela-dupla tr.linha-total td.col-num-linha,
+  #painel-bases .tabela-dupla tr.linha-total td.col-num-linha,
+  #painel-basesliraa .tabela-dupla tr.linha-total td.col-num-linha,
+  #painel-basesliraa .tabela-liraa-exclusiva tr.linha-total td.col-pos,
+  #painel-coflagrados .tabela-dupla tr.linha-total td.col-num-linha,
+  #painel-resumogeral .tabela-dupla tr.linha-total td.col-num-linha {
+    background: #333 !important;
+  }
+  #painel-basesliraa .tabela-dupla tr.linha-liraa-selecionada td.col-num-linha,
+  #painel-basesliraa .tabela-liraa-exclusiva td.col-pos {
+    background: #e8f5e9 !important;
+  }
+  #painel-resumo .tabela-dupla thead th.col-num-linha,
+  #painel-bases .tabela-dupla thead th.col-num-linha,
+  #painel-basesliraa .tabela-dupla thead th.col-num-linha,
+  #painel-basesliraa .tabela-liraa-exclusiva thead th.col-pos,
+  #painel-coflagrados .tabela-dupla thead th.col-num-linha,
+  #painel-resumogeral .tabela-dupla thead th.col-num-linha {
+    position: sticky;
+    left: 0;
+    top: 0;
+    z-index: 5;
+  }
+
+  /* Larguras mínimas adequadas ao conteúdo das colunas em telas de computador e tablet */
+  #painel-resumo .tabela-dupla table,
+  #painel-bases .tabela-dupla table,
+  #painel-coflagrados .tabela-dupla table,
+  #painel-resumogeral .tabela-dupla table {
+    min-width: 480px;
+    width: 100%;
+  }
+  #painel-basesliraa .tabela-dupla.com-liraa table,
+  #painel-basesliraa .tabela-liraa-exclusiva {
+    min-width: 530px;
+    width: 100%;
+  }
+  #painel-boletins .tabela-boletins-imoveis {
+    min-width: 530px;
+    width: 100%;
+  }
+  #painel-boletins .tabela-boletins-resumo {
+    min-width: 260px;
+    width: 100%;
+  }
+
+  /* Espaçamento aprimorado para linhas e células */
+  #painel-boletins .tabela-dupla th,
+  #painel-resumo .tabela-dupla th,
+  #painel-bases .tabela-dupla th,
+  #painel-basesliraa .tabela-dupla th,
+  #painel-basesliraa .tabela-liraa-exclusiva th,
+  #painel-coflagrados .tabela-dupla th,
+  #painel-resumogeral .tabela-dupla th {
+    height: 28px;
+    padding: 4px 2px;
+    font-size: 10px;
+  }
+  #painel-boletins .tabela-dupla td,
+  #painel-resumo .tabela-dupla td,
+  #painel-bases .tabela-dupla td,
+  #painel-basesliraa .tabela-dupla td,
+  #painel-basesliraa .tabela-liraa-exclusiva td,
+  #painel-coflagrados .tabela-dupla td,
+  #painel-resumogeral .tabela-dupla td {
+    height: 24px;
+    padding: 2px 2px;
+    font-size: 10.5px;
+    line-height: 1.2;
+  }
+  #painel-boletins .tabela-dupla td input,
+  #painel-resumo .tabela-dupla td input,
+  #painel-bases .tabela-dupla td input,
+  #painel-basesliraa .tabela-dupla td input,
+  #painel-coflagrados .tabela-dupla td input,
+  #painel-resumogeral .tabela-dupla td input {
+    font-size: 11px;
+  }
+
+  /* Banner explicativo de rolagem horizontal exclusivo para mobile */
+  .dica-scroll-tabela {
+    display: none;
+  }
+
+  /* ==========================================================================
+     REGRAS EXCLUSIVAS PARA TELAS MENORES (MOBILE E TABLETS: <= 850px)
+     ========================================================================== */
+  @media screen and (max-width: 850px) {
+    /* Exibir dica de rolagem horizontal */
+    .dica-scroll-tabela {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #1b5e20;
+      background: #e8f5e9;
+      border: 1px solid #a5d6a7;
+      border-radius: 5px;
+      padding: 6px 10px;
+      margin: 8px 0 12px 0;
+      font-weight: bold;
+    }
+
+    /* Empilhamento vertical das duplas de tabelas (ocupam 100% da largura útil) */
+    #painel-boletins .dupla-tabelas,
+    #painel-resumo .dupla-tabelas,
+    #painel-bases .dupla-tabelas,
+    #painel-basesliraa .dupla-tabelas,
+    #painel-coflagrados .dupla-tabelas,
+    #painel-resumogeral .dupla-tabelas {
+      flex-direction: column !important;
+      gap: 16px !important;
+      align-items: stretch !important;
+    }
+
+    /* Cada tabela ganha seu próprio contêiner com rolagem horizontal independente */
+    #painel-boletins .tabela-dupla,
+    #painel-resumo .tabela-dupla,
+    #painel-bases .tabela-dupla,
+    #painel-basesliraa .tabela-dupla,
+    #painel-coflagrados .tabela-dupla,
+    #painel-resumogeral .tabela-dupla,
+    #painel-basesliraa .tabela-liraa-exclusiva-wrapper {
+      flex: none !important;
+      width: 100% !important;
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      background: #fff;
+      padding: 1px;
+      box-sizing: border-box;
+    }
+
+    /* Reduzir o padding da página A4 no mobile para não desperdiçar espaço lateral */
+    #painel-boletins .pagina-a4,
+    #painel-resumo .pagina-a4,
+    #painel-bases .pagina-a4,
+    #painel-basesliraa .pagina-a4,
+    #painel-coflagrados .pagina-a4,
+    #painel-resumogeral .pagina-a4 {
+      padding: 10px 8px !important;
+      margin-bottom: 16px !important;
+      min-height: auto !important;
+    }
+    #painel-boletins .bloco-quarteirao .pagina-a4 {
+      min-height: auto !important;
+    }
+
+    /* Células e linhas mais altas para toque confortável em smartphones */
+    #painel-boletins .tabela-dupla th,
+    #painel-resumo .tabela-dupla th,
+    #painel-bases .tabela-dupla th,
+    #painel-basesliraa .tabela-dupla th,
+    #painel-basesliraa .tabela-liraa-exclusiva th,
+    #painel-coflagrados .tabela-dupla th,
+    #painel-resumogeral .tabela-dupla th {
+      height: 32px !important;
+      padding: 6px 3px !important;
+      font-size: 11px !important;
+    }
+    #painel-boletins .tabela-dupla td,
+    #painel-resumo .tabela-dupla td,
+    #painel-bases .tabela-dupla td,
+    #painel-basesliraa .tabela-dupla td,
+    #painel-basesliraa .tabela-liraa-exclusiva td,
+    #painel-coflagrados .tabela-dupla td,
+    #painel-resumogeral .tabela-dupla td {
+      height: 28px !important;
+      padding: 3px 2px !important;
+      font-size: 11.5px !important;
+    }
+
+    #painel-boletins .tabela-dupla td input,
+    #painel-resumo .tabela-dupla td input,
+    #painel-bases .tabela-dupla td input,
+    #painel-basesliraa .tabela-dupla td input,
+    #painel-coflagrados .tabela-dupla td input,
+    #painel-resumogeral .tabela-dupla td input {
+      font-size: 12px !important;
+    }
+
+    /* Otimização de colunas específicas para não espremer textos */
+    #painel-resumo .tabela-dupla .col-num-linha,
+    #painel-bases .tabela-dupla .col-num-linha,
+    #painel-coflagrados .tabela-dupla .col-num-linha,
+    #painel-resumogeral .tabela-dupla .col-num-linha {
+      width: 46px !important;
+      min-width: 46px !important;
+    }
+    #painel-resumo .tabela-dupla .col-q,
+    #painel-bases .tabela-dupla .col-q,
+    #painel-coflagrados .tabela-dupla .col-q,
+    #painel-resumogeral .tabela-dupla .col-q {
+      min-width: 95px !important;
+      font-size: 11.5px !important;
+    }
+    #painel-resumo .tabela-dupla .col-n,
+    #painel-bases .tabela-dupla .col-n,
+    #painel-coflagrados .tabela-dupla .col-n,
+    #painel-resumogeral .tabela-dupla .col-n {
+      min-width: 38px !important;
+      width: 38px !important;
+      font-size: 11px !important;
+    }
+    #painel-resumo .tabela-dupla .col-t,
+    #painel-bases .tabela-dupla .col-t,
+    #painel-coflagrados .tabela-dupla .col-t,
+    #painel-resumogeral .tabela-dupla .col-t {
+      min-width: 50px !important;
+      width: 50px !important;
+      font-weight: bold !important;
+    }
+
+    /* Bases+LIRAa no mobile */
+    #painel-basesliraa .tabela-dupla.com-liraa .col-num-linha,
+    #painel-basesliraa .tabela-liraa-exclusiva .col-pos {
+      width: 52px !important;
+      min-width: 52px !important;
+    }
+    #painel-basesliraa .col-posicao-btn {
+      min-height: 26px !important;
+      font-size: 11px !important;
+    }
+    #painel-basesliraa .tabela-dupla.com-liraa .col-q,
+    #painel-basesliraa .tabela-liraa-exclusiva .col-q {
+      min-width: 88px !important;
+      font-size: 11.5px !important;
+    }
+    #painel-basesliraa .tabela-dupla.com-liraa .col-n,
+    #painel-basesliraa .tabela-liraa-exclusiva .col-n {
+      min-width: 36px !important;
+      width: 36px !important;
+    }
+    #painel-basesliraa .tabela-dupla.com-liraa .col-t,
+    #painel-basesliraa .tabela-liraa-exclusiva .col-t {
+      min-width: 48px !important;
+      width: 48px !important;
+    }
+    #painel-basesliraa .tabela-dupla.com-liraa .col-liraa,
+    #painel-basesliraa .tabela-liraa-exclusiva .col-liraa {
+      min-width: 54px !important;
+      width: 54px !important;
+    }
+
+    /* Boletim de Reconhecimento no mobile */
+    #painel-boletins .tabela-boletins-imoveis .col-rua {
+      min-width: 170px !important;
+      font-size: 12px !important;
+    }
+    #painel-boletins .tabela-boletins-imoveis .col-numero {
+      min-width: 60px !important;
+      width: 60px !important;
+    }
+    #painel-boletins .tabela-boletins-imoveis .col-comp {
+      min-width: 120px !important;
+    }
+    #painel-boletins .tabela-boletins-imoveis .col-seq {
+      min-width: 60px !important;
+      width: 60px !important;
+    }
+    #painel-boletins .tabela-boletins-imoveis .col-tipo {
+      min-width: 55px !important;
+      width: 55px !important;
+    }
+    #painel-boletins .tabela-boletins-imoveis td input {
+      height: 26px !important;
+      font-size: 12px !important;
+    }
+
+    /* Cabeçalhos de formulário em 2 colunas nos celulares */
+    #painel-boletins .cabecalho-tabelas,
+    #painel-resumo .cabecalho-tabelas,
+    #painel-bases .cabecalho-tabelas,
+    #painel-basesliraa .cabecalho-tabelas,
+    #painel-coflagrados .cabecalho-tabelas,
+    #painel-resumogeral .cabecalho-tabelas {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 6px 10px !important;
+      padding: 8px !important;
+    }
+    #painel-boletins .cabecalho-tabelas .campo-total,
+    #painel-resumo .cabecalho-tabelas .campo-total,
+    #painel-bases .cabecalho-tabelas .campo-total,
+    #painel-basesliraa .cabecalho-tabelas .campo-total,
+    #painel-coflagrados .cabecalho-tabelas .campo-total,
+    #painel-resumogeral .cabecalho-tabelas .campo-total {
+      grid-column: span 2 !important;
+    }
+
+    /* Rodapés de página no mobile */
+    #painel-boletins .rodape-pagina,
+    #painel-resumo .rodape-pagina,
+    #painel-bases .rodape-pagina,
+    #painel-basesliraa .rodape-pagina,
+    #painel-coflagrados .rodape-pagina,
+    #painel-resumogeral .rodape-pagina {
+      gap: 10px !important;
+      margin-top: 10px !important;
+    }
+    #painel-boletins .rodape-pagina .campo-rodape,
+    #painel-resumo .rodape-pagina .campo-rodape,
+    #painel-bases .rodape-pagina .campo-rodape,
+    #painel-basesliraa .rodape-pagina .campo-rodape,
+    #painel-coflagrados .rodape-pagina .campo-rodape,
+    #painel-resumogeral .rodape-pagina .campo-rodape {
+      flex: 1 1 100% !important;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    #painel-boletins .cabecalho-tabelas,
+    #painel-resumo .cabecalho-tabelas,
+    #painel-bases .cabecalho-tabelas,
+    #painel-basesliraa .cabecalho-tabelas,
+    #painel-coflagrados .cabecalho-tabelas,
+    #painel-resumogeral .cabecalho-tabelas {
+      grid-template-columns: 1fr !important;
+    }
+    #painel-boletins .cabecalho-tabelas .campo-total,
+    #painel-resumo .cabecalho-tabelas .campo-total,
+    #painel-bases .cabecalho-tabelas .campo-total,
+    #painel-basesliraa .cabecalho-tabelas .campo-total,
+    #painel-coflagrados .cabecalho-tabelas .campo-total,
+    #painel-resumogeral .cabecalho-tabelas .campo-total {
+      grid-column: span 1 !important;
+    }
+  }
+
   /* ===== ESTILOS PARA EXPORTAÇÃO DE PDF DE ALTA RESOLUÇÃO (SEM CORTES) ===== */
   .pdf-export-wrapper {
     position: absolute !important;
@@ -762,6 +1169,7 @@
     <button class="acao" onclick="imprimir()">🖨️ Imprimir (selecionado)</button>
   </div>
   <div class="aviso-sincronizacao" id="avisoSincronizacao"></div>
+  <div class="dica-scroll-tabela no-print">↔️ Deslize a tabela para o lado para visualizar todas as colunas</div>
   <div id="tabelaBoletins"></div>
 </div>
 
@@ -774,6 +1182,7 @@
     <button class="acao" onclick="imprimir()">🖨️ Imprimir</button>
     <span class="badge-nuvem online" id="statusPMCD">☁️ PMCD Conectado (Tempo Real)</span>
   </div>
+  <div class="dica-scroll-tabela no-print">↔️ Deslize a tabela para o lado para visualizar todas as colunas</div>
   <div id="tabelaResumo"></div>
 </div>
 
@@ -787,6 +1196,7 @@
     <button class="acao sucesso" onclick="gerarPDF('bases')">📄 Gerar PDF</button>
     <button class="acao" onclick="imprimir()">🖨️ Imprimir</button>
   </div>
+  <div class="dica-scroll-tabela no-print">↔️ Deslize a tabela para o lado para visualizar todas as colunas</div>
   <div id="tabelaBases"></div>
 </div>
 
@@ -819,6 +1229,7 @@
       <span>🏢 1. TABELA GERAL — BASES + LIRAa (Seleção por Quarteirão)</span>
       <span style="font-size: 11px; font-weight: normal; opacity: 0.9;">Clique no número da Posição para selecionar</span>
     </div>
+    <div class="dica-scroll-tabela no-print">↔️ Deslize a tabela para o lado para visualizar todas as colunas</div>
     <div id="tabelaBasesLiraa"></div>
   </div>
 
@@ -828,6 +1239,7 @@
       <span>🎯 2. TABELA EXCLUSIVA — QUARTEIRÕES SELECIONADOS PARA O LIRAa</span>
       <span style="font-size: 11px; font-weight: normal; opacity: 0.9;">Amostra Oficial da Coordenação</span>
     </div>
+    <div class="dica-scroll-tabela no-print">↔️ Deslize a tabela para o lado para visualizar todas as colunas</div>
     <div id="tabelaLiraaSelecionados"></div>
   </div>
 </div>
@@ -839,6 +1251,7 @@
     <button class="acao sucesso" onclick="gerarPDF('coflagrados')">📄 Gerar PDF</button>
     <button class="acao" onclick="imprimir()">🖨️ Imprimir</button>
   </div>
+  <div class="dica-scroll-tabela no-print">↔️ Deslize a tabela para o lado para visualizar todas as colunas</div>
   <div id="tabelaCoflagrados"></div>
 </div>
 
@@ -849,6 +1262,7 @@
     <button class="acao sucesso" onclick="gerarPDF('resumogeral')">📄 Gerar PDF</button>
     <button class="acao" onclick="imprimir()">🖨️ Imprimir</button>
   </div>
+  <div class="dica-scroll-tabela no-print">↔️ Deslize a tabela para o lado para visualizar todas as colunas</div>
   <div id="tabelaResumoGeral"></div>
 </div>
 
