@@ -1,5 +1,5 @@
-// Service Worker para Andamento dos quarteirões - PWA
-const CACHE_NAME = 'andamento-quarteiroes-v1';
+// Service Worker para Andamento dos quarteirões - PWA (100% Offline-Ready)
+const CACHE_NAME = 'andamento-quarteiroes-v2';
 
 const STATIC_ASSETS = [
   '/',
@@ -9,8 +9,9 @@ const STATIC_ASSETS = [
   '/icon-512.png',
   '/apple-touch-icon.png',
   '/favicon.png',
-  'https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&display=swap',
-  'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'
+  '/libs/firebase-app-compat.js',
+  '/libs/firebase-database-compat.js',
+  '/libs/html2pdf.bundle.min.js'
 ];
 
 // Instalação do Service Worker e pré-cache dos recursos essenciais
@@ -44,47 +45,58 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Ignorar requisições não-GET
+  // Ignorar requisições que não sejam GET
   if (event.request.method !== 'GET') {
     return;
   }
 
-  // Não cachear requisições para o Firebase Realtime Database ou chamadas de websocket
+  // Não interceptar requisições em tempo real do Firebase Realtime Database
   if (url.hostname.includes('firebaseio.com') || url.pathname.includes('/.lp') || url.pathname.includes('/.ws')) {
     return;
   }
 
-  // Estratégia Network First com fallback de Cache para navegação e dados
+  // Estratégia para navegação da página (HTML): Network First com fallback de Cache
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(async () => {
+          const cached = await caches.match(event.request) || await caches.match('/index.html') || await caches.match('/');
+          if (cached) return cached;
+          return new Response('Offline - Conteúdo em cache não encontrado.', {
+            status: 200,
+            headers: new Headers({ 'Content-Type': 'text/html; charset=utf-8' })
+          });
+        })
+    );
+    return;
+  }
+
+  // Estratégia para scripts, bibliotecas, imagens e assets: Cache First com fallback de rede
   event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        // Se a resposta for válida, clonar e atualizar o cache
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
           });
         }
         return networkResponse;
-      })
-      .catch(async () => {
-        // Fallback para o cache quando offline
-        const cachedResponse = await caches.match(event.request);
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        // Se for navegação de página e não houver cache específico, retorna o index.html
-        if (event.request.mode === 'navigate') {
-          const indexPage = await caches.match('/index.html');
-          if (indexPage) return indexPage;
-        }
-
-        return new Response('Offline - Conteúdo indisponível sem conexão.', {
-          status: 503,
-          statusText: 'Service Unavailable',
-          headers: new Headers({ 'Content-Type': 'text/plain; charset=utf-8' })
-        });
-      })
+      }).catch(() => {
+        return new Response('', { status: 404 });
+      });
+    })
   );
 });

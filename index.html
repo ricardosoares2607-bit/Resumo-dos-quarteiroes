@@ -24,9 +24,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&display=swap" rel="stylesheet">
 
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="/libs/firebase-app-compat.js"></script>
+<script src="/libs/firebase-database-compat.js"></script>
+<script src="/libs/html2pdf.bundle.min.js"></script>
+<script>
+  if (typeof firebase === 'undefined') {
+    document.write('<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"><\/script>');
+    document.write('<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"><\/script>');
+  }
+</script>
 
 <style>
   * { box-sizing: border-box; }
@@ -1290,10 +1296,33 @@
   const STORAGE_FORMULARIOS = "diario_formularios_novos_v1";
   const STORAGE_SELECAO_BOLETINS = "diario_boletins_selecao";
   const STORAGE_LIRAA_SELECIONADOS = "diario_liraa_selecionados_v1";
+  const STORAGE_PENDENTE_NUVEM = "diario_pendente_nuvem_v1";
+  const STORAGE_ULTIMO_TS = "diario_ultimo_timestamp_v1";
+  const STORAGE_BACKUP_COMPLETO = "diario_backup_completo_offline_v1";
+
+  function normalizarArraySemanas(val) {
+    if (!val) return [];
+    if (Array.isArray(val)) return val;
+    if (typeof val === "object") {
+      const keys = Object.keys(val).sort((a, b) => {
+        const na = parseInt(a, 10);
+        const nb = parseInt(b, 10);
+        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        return a.localeCompare(b, "pt-BR", { numeric: true });
+      });
+      return keys.map(k => val[k]).filter(Boolean);
+    }
+    return [];
+  }
 
   let semanaCount = 0;
   let timeoutSalvar = null;
-  let ultimoTimestampLocal = 0;
+  let ultimoTimestampLocal = (function() {
+    try {
+      const ts = localStorage.getItem("diario_ultimo_timestamp_v1");
+      return ts ? parseInt(ts, 10) || 0 : 0;
+    } catch (e) { return 0; }
+  })();
 
   let statusQuarteiroes = {};
   let paginas = { andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, basesliraa: 1, coflagrados: 1, resumogeral: 1 };
@@ -1729,31 +1758,154 @@
     });
   }
 
-  function monitorarConexaoNuvem() {
+  function atualizarBadgeNuvem(online, textoCustom) {
     const badge = document.getElementById("statusNuvem");
-    if (!nuvemAtiva || !dbRef) {
+    if (!badge) return;
+    if (textoCustom) {
       badge.className = "badge-nuvem pendente";
-      badge.textContent = "⚠️ Nuvem não configurada";
+      badge.textContent = textoCustom;
       return;
     }
-    firebase.database().ref(".info/connected").on("value", (snap) => {
-      if (snap.val() === true) {
-        badge.className = "badge-nuvem online"; badge.textContent = "☁️ Nuvem Conectada (Tempo Real)";
+    const pendente = (function() {
+      try { return localStorage.getItem(STORAGE_PENDENTE_NUVEM) === "1"; } catch (e) { return false; }
+    })();
+
+    if (online) {
+      if (pendente) {
+        badge.className = "badge-nuvem pendente";
+        badge.textContent = "⏳ Conectado (Sincronizando...)";
       } else {
-        badge.className = "badge-nuvem offline"; badge.textContent = "⚡ Modo Offline (Salvo Localmente)";
+        badge.className = "badge-nuvem online";
+        badge.textContent = "☁️ Nuvem Conectada (Tempo Real)";
       }
+    } else {
+      if (pendente) {
+        badge.className = "badge-nuvem pendente";
+        badge.textContent = "⚡ Modo Offline (Alterações salvas no aparelho)";
+      } else {
+        badge.className = "badge-nuvem offline";
+        badge.textContent = "⚡ Modo Offline (Dados salvos no aparelho)";
+      }
+    }
+  }
+
+  function marcarAlteracaoPendente(pendente) {
+    try {
+      if (pendente) {
+        localStorage.setItem(STORAGE_PENDENTE_NUVEM, "1");
+      } else {
+        localStorage.removeItem(STORAGE_PENDENTE_NUVEM);
+      }
+    } catch (e) {}
+    atualizarBadgeNuvem(navigator.onLine);
+  }
+
+  function enviarDadosLocaisParaNuvem() {
+    if (!nuvemAtiva || !dbRef || !navigator.onLine) return;
+    try {
+      const semanas = coletarDados();
+      const agora = Math.max(Date.now(), ultimoTimestampLocal + 1);
+      ultimoTimestampLocal = agora;
+      try { localStorage.setItem(STORAGE_ULTIMO_TS, String(agora)); } catch (e) {}
+
+      const payload = {
+        timestamp: agora,
+        semanas: semanas,
+        statusQuarteiroes: statusQuarteiroes,
+        paginas: paginas,
+        cabecalhos: cabecalhos,
+        rodapes: rodapes,
+        dadosFormularios: dadosFormularios,
+        liraaSelecionados: Array.from(quarteiroesLiraaSelecionados)
+      };
+
+      dbRef.set(payload).then(() => {
+        marcarAlteracaoPendente(false);
+        atualizarBadgeNuvem(true);
+      }).catch(err => {
+        console.warn("Falha no envio de dados locais para a nuvem:", err);
+      });
+    } catch (e) {
+      console.error("Erro ao preparar dados para sincronização:", e);
+    }
+  }
+
+  function sincronizarTudoComNuvem() {
+    if (!navigator.onLine) return;
+    const pendente = (function() {
+      try { return localStorage.getItem(STORAGE_PENDENTE_NUVEM) === "1"; } catch (e) { return false; }
+    })();
+    if (pendente) {
+      enviarDadosLocaisParaNuvem();
+    }
+    salvarResumoReconhecimentoPMCD();
+  }
+
+  function monitorarConexaoNuvem() {
+    atualizarBadgeNuvem(navigator.onLine);
+
+    window.addEventListener("online", () => {
+      atualizarBadgeNuvem(true);
+      mostrarAviso("🌐 Conexão restabelecida! Sincronizando dados...");
+      sincronizarTudoComNuvem();
     });
+
+    window.addEventListener("offline", () => {
+      atualizarBadgeNuvem(false);
+      mostrarAviso("⚡ Operando offline. Todos os seus lançamentos ficam 100% salvos no aparelho!");
+    });
+
+    if (!nuvemAtiva || !dbRef) {
+      atualizarBadgeNuvem(false, "⚠️ Nuvem em modo local");
+      return;
+    }
+
+    try {
+      firebase.database().ref(".info/connected").on("value", (snap) => {
+        const conectado = snap.val() === true;
+        atualizarBadgeNuvem(conectado);
+        if (conectado) {
+          sincronizarTudoComNuvem();
+        }
+      });
+    } catch (e) {}
+
     dbRef.on("value", (snapshot) => {
       const dadosNuvem = snapshot.val();
-      if (!dadosNuvem) return;
-      if (dadosNuvem.timestamp && dadosNuvem.timestamp === ultimoTimestampLocal) return;
+      if (!dadosNuvem) {
+        const semanasLocais = coletarDados();
+        if (semanasLocais && semanasLocais.length > 0) {
+          enviarDadosLocaisParaNuvem();
+        }
+        return;
+      }
+
+      const tsRemoto = Number(dadosNuvem.timestamp) || 0;
+      const tsLocal = Number(ultimoTimestampLocal) || 0;
+      const pendente = (function() {
+        try { return localStorage.getItem(STORAGE_PENDENTE_NUVEM) === "1"; } catch (e) { return false; }
+      })();
+
+      if (pendente || tsLocal > tsRemoto) {
+        enviarDadosLocaisParaNuvem();
+        return;
+      }
+
+      if (tsRemoto <= tsLocal) return;
+
       aplicarDadosRemotos(dadosNuvem);
+    }, (err) => {
+      console.warn("Aviso de conexão Firebase:", err);
+      atualizarBadgeNuvem(false);
     });
   }
 
   function aplicarDadosRemotos(dados) {
     try {
-      if (!dados || !dados.semanas) return;
+      if (!dados) return;
+      const semanasRemotas = normalizarArraySemanas(dados.semanas);
+      if (semanasRemotas.length === 0 && !dados.statusQuarteiroes && !dados.dadosFormularios) return;
+
       statusQuarteiroes = dados.statusQuarteiroes || {};
       paginas = Object.assign({ andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, basesliraa: 1, coflagrados: 1, resumogeral: 1 }, dados.paginas);
       cabecalhos = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, basesliraa: {}, coflagrados: {}, resumogeral: {} }, dados.cabecalhos);
@@ -1767,12 +1919,22 @@
         salvarSelecaoLiraa();
       }
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(dados.semanas));
+      if (dados.timestamp) {
+        ultimoTimestampLocal = dados.timestamp;
+        try { localStorage.setItem(STORAGE_ULTIMO_TS, String(dados.timestamp)); } catch (e) {}
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(semanasRemotas));
       salvarStatus(); salvarPaginas(); salvarCabecalhos(); salvarRodapes(); salvarFormularios();
+      marcarAlteracaoPendente(false);
 
       document.getElementById("semanas").innerHTML = "";
       semanaCount = 0;
-      dados.semanas.forEach(s => criarSemana(s));
+      if (semanasRemotas.length > 0) {
+        semanasRemotas.forEach(s => criarSemana(s));
+      } else {
+        criarSemana();
+      }
 
       recalcular(); atualizarResumoSemanal(); atualizarTotalImoveis(); atualizarInformados();
       atualizarAndamento(); atualizarConcluidos(); renderizarFormularioBoletins();
@@ -1782,7 +1944,7 @@
       renderizarCoflagrados();
       renderizarResumoGeral();
 
-      mostrarAviso("🔄 Sincronizado com outro aparelho!");
+      mostrarAviso("🔄 Sincronizado com a nuvem!");
     } catch (e) { console.error("Erro na sincronização remota:", e); }
   }
 
@@ -1957,12 +2119,32 @@
       bloco.addEventListener("click", (e) => {
         const selSem = divSemana.querySelector(".select-semana");
         const inpD = bloco.querySelector('input[type="date"]');
-        const semanaValida = selSem && selSem.value.trim() !== "";
-        const dataValida = inpD && inpD.value.trim() !== "";
+        let semanaValida = selSem && selSem.value.trim() !== "";
+        let dataValida = inpD && inpD.value.trim() !== "";
         if (!semanaValida || !dataValida) {
           if (e.target !== inpD && e.target !== selSem) {
-            if (!semanaValida) { mostrarAviso("⚠️ Seleção obrigatória: Escolha a Semana no topo antes de fazer os lançamentos!"); selSem.focus(); }
-            else if (!dataValida) { mostrarAviso(`⚠️ Data obrigatória: Preencha a data de ${dia} para liberar os lançamentos!`); inpD.focus(); }
+            let autoDefiniu = false;
+            if (!semanaValida) {
+              const numFmt = String(idSemana).padStart(2, "0");
+              const defaultSemana = `Semana ${numFmt}`;
+              selSem.value = defaultSemana;
+              semanaValida = true;
+              autoDefiniu = true;
+            }
+            if (!dataValida) {
+              const hoje = new Date().toISOString().slice(0, 10);
+              inpD.value = hoje;
+              dataValida = true;
+              autoDefiniu = true;
+            }
+            if (autoDefiniu) {
+              verificarBloqueioSemana(divSemana);
+              salvarComAtraso();
+              mostrarAviso(`📅 Data e semana definidas. Lançamentos liberados!`);
+              if (e.target && e.target.tagName === 'INPUT' && !e.target.disabled) {
+                e.target.focus();
+              }
+            }
           }
         }
       });
@@ -4775,20 +4957,64 @@
     try {
       const semanas = coletarDados();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(semanas));
-      if (nuvemAtiva && dbRef) {
-        const agora = Date.now();
-        ultimoTimestampLocal = agora;
+      salvarStatus();
+      salvarPaginas();
+      salvarCabecalhos();
+      salvarRodapes();
+      salvarFormularios();
+      salvarSelecaoLiraa();
+
+      const agora = Date.now();
+      ultimoTimestampLocal = agora;
+      try { localStorage.setItem(STORAGE_ULTIMO_TS, String(agora)); } catch (e) {}
+
+      try {
+        const backupCompleto = {
+          timestamp: agora,
+          semanas: semanas,
+          statusQuarteiroes: statusQuarteiroes,
+          paginas: paginas,
+          cabecalhos: cabecalhos,
+          rodapes: rodapes,
+          dadosFormularios: dadosFormularios,
+          liraaSelecionados: Array.from(quarteiroesLiraaSelecionados)
+        };
+        localStorage.setItem(STORAGE_BACKUP_COMPLETO, JSON.stringify(backupCompleto));
+      } catch (e) {}
+
+      marcarAlteracaoPendente(true);
+
+      if (navigator.onLine && nuvemAtiva && dbRef) {
         const payload = {
-          timestamp: agora, semanas: semanas, statusQuarteiroes: statusQuarteiroes,
-          paginas: paginas, cabecalhos: cabecalhos, rodapes: rodapes, dadosFormularios: dadosFormularios,
+          timestamp: agora,
+          semanas: semanas,
+          statusQuarteiroes: statusQuarteiroes,
+          paginas: paginas,
+          cabecalhos: cabecalhos,
+          rodapes: rodapes,
+          dadosFormularios: dadosFormularios,
           liraaSelecionados: Array.from(quarteiroesLiraaSelecionados)
         };
         dbRef.set(payload)
-          .then(() => mostrarAviso("☁️ Salvo e sincronizado na nuvem!"))
-          .catch(err => { console.error(err); mostrarAviso("💾 Salvo localmente (offline)"); });
-      } else { mostrarAviso("💾 Salvo automaticamente"); }
+          .then(() => {
+            marcarAlteracaoPendente(false);
+            atualizarBadgeNuvem(true);
+            mostrarAviso("☁️ Salvo e sincronizado na nuvem!");
+          })
+          .catch(err => {
+            console.warn("Falha no envio à nuvem (offline):", err);
+            atualizarBadgeNuvem(false);
+            mostrarAviso("💾 Salvo no aparelho (offline)");
+          });
+      } else {
+        atualizarBadgeNuvem(false);
+        mostrarAviso("💾 Salvo no aparelho (offline)");
+      }
       salvarResumoReconhecimentoPMCD();
-    } catch (e) { mostrarAviso("⚠️ Erro ao salvar"); }
+    } catch (e) {
+      console.error("Erro ao salvar:", e);
+      mostrarAviso("⚠️ Erro ao salvar");
+    }
   }
 
   function salvarComAtraso() {
@@ -4810,13 +5036,41 @@
 
   function carregar() {
     try {
+      let semanas = [];
       const dados = localStorage.getItem(STORAGE_KEY);
-      if (!dados) return false;
-      const semanas = JSON.parse(dados);
-      if (!Array.isArray(semanas) || semanas.length === 0) return false;
+      if (dados) {
+        const parsed = JSON.parse(dados);
+        semanas = normalizarArraySemanas(parsed);
+      }
+
+      if (semanas.length === 0) {
+        const backup = localStorage.getItem(STORAGE_BACKUP_COMPLETO);
+        if (backup) {
+          try {
+            const bParsed = JSON.parse(backup);
+            semanas = normalizarArraySemanas(bParsed.semanas);
+            if (bParsed.statusQuarteiroes) statusQuarteiroes = bParsed.statusQuarteiroes;
+            if (bParsed.paginas) paginas = Object.assign(paginas, bParsed.paginas);
+            if (bParsed.cabecalhos) cabecalhos = Object.assign(cabecalhos, bParsed.cabecalhos);
+            if (bParsed.rodapes) rodapes = Object.assign(rodapes, bParsed.rodapes);
+            if (bParsed.dadosFormularios) dadosFormularios = Object.assign(dadosFormularios, bParsed.dadosFormularios);
+            if (bParsed.liraaSelecionados && Array.isArray(bParsed.liraaSelecionados)) {
+              quarteiroesLiraaSelecionados = new Set(bParsed.liraaSelecionados.map(String));
+            }
+          } catch (e) {}
+        }
+      }
+
+      if (semanas.length === 0) return false;
+
+      document.getElementById("semanas").innerHTML = "";
+      semanaCount = 0;
       semanas.forEach(s => criarSemana(s));
       return true;
-    } catch (e) { return false; }
+    } catch (e) {
+      console.error("Erro ao carregar do localStorage:", e);
+      return false;
+    }
   }
 
   function mostrarAviso(msg) {
@@ -4989,8 +5243,7 @@
       try {
         const dados = JSON.parse(e.target.result);
         if (!dados || (!dados.semanas && !Array.isArray(dados))) throw new Error("Arquivo não reconhecido como backup válido.");
-        if (!confirm("⚠️ Atenção: A restauração do backup substituirá os dados atuais. Deseja continuar?")) { event.target.value = ""; return; }
-        const semanas = dados.semanas || dados;
+        const semanas = normalizarArraySemanas(dados.semanas || dados);
         statusQuarteiroes = dados.statusQuarteiroes || {};
         paginas = Object.assign({ andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, basesliraa: 1, coflagrados: 1, resumogeral: 1 }, dados.paginas);
         cabecalhos = Object.assign({ andamento: {}, concluidos: {}, boletins: {}, resumo: {}, bases: {}, basesliraa: {}, coflagrados: {}, resumogeral: {} }, dados.cabecalhos);
