@@ -1068,6 +1068,104 @@
     .tabela-dupla.com-liraa .col-liraa { width: 13% !important; font-weight: bold !important; background: #f1f8e9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .tabela-dupla.com-liraa thead th.col-liraa,
     .tabela-dupla.com-liraa tr.linha-total td.col-liraa { background: #1b5e20 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .barra-flutuante-selecao, .btn-toggle-selecao { display: none !important; }
+    td.celula-selecionada { background-color: transparent !important; outline: none !important; }
+  }
+
+  /* ===== SELEÇÃO MÚLTIPLA DE CÉLULAS (DIÁRIO, BOLETINS E CONFLAGRADOS) ===== */
+  td.celula-selecionada {
+    background-color: #bfdbfe !important;
+    outline: 2px solid #2563eb !important;
+    outline-offset: -2px;
+    position: relative;
+    z-index: 2;
+    transition: background-color 0.1s ease;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  td.celula-selecionada input {
+    background-color: transparent !important;
+    color: #1e3a8a !important;
+    font-weight: 700 !important;
+  }
+  .modo-selecao-ativo table tbody td,
+  .modo-selecao-ativo table tbody td input {
+    cursor: cell !important;
+  }
+  .btn-toggle-selecao {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-toggle-selecao.ativo {
+    background: #16a34a !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #16a34a;
+  }
+  .barra-flutuante-selecao {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0f172a;
+    color: #ffffff;
+    padding: 8px 18px;
+    border-radius: 35px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), 0 4px 10px rgba(0, 0, 0, 0.25);
+    display: none;
+    align-items: center;
+    gap: 10px;
+    z-index: 10000;
+    font-family: inherit;
+    font-size: 13px;
+    animation: surgimentoBarra 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    max-width: 95vw;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  @keyframes surgimentoBarra {
+    from { opacity: 0; transform: translate(-50%, 15px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+  .barra-flutuante-selecao .badge-contador {
+    background: #2563eb;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .barra-flutuante-selecao button {
+    background: #334155;
+    color: #ffffff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .barra-flutuante-selecao button:hover {
+    background: #475569;
+    transform: translateY(-1px);
+  }
+  .barra-flutuante-selecao button.btn-perigo {
+    background: #991b1b;
+  }
+  .barra-flutuante-selecao button.btn-perigo:hover {
+    background: #dc2626;
+  }
+  .barra-flutuante-selecao button.btn-sucesso {
+    background: #166534;
+  }
+  .barra-flutuante-selecao button.btn-sucesso:hover {
+    background: #16a34a;
   }
 </style>
 </head>
@@ -1104,6 +1202,7 @@
     <button class="acao sucesso" onclick="exportarBackupJSON()">💾 Backup JSON</button>
     <button class="acao info" onclick="dispararImportacaoJSON()">📂 Restaurar Backup</button>
     <button class="acao perigo" onclick="limparTudo()">🗑️ Limpar Tudo</button>
+    <button class="acao info btn-toggle-selecao" id="btnModoSelecaoDiario" onclick="alternarModoSelecao('diario')">🔲 Selecionar Células</button>
     <input type="file" id="inputBackupJSON" accept=".json" style="display: none;" onchange="importarBackupJSON(event)">
   </div>
   <div class="aviso" id="aviso"></div>
@@ -1171,6 +1270,7 @@
   </div>
   <div class="barra-botoes-tabelas">
     <button class="acao info" onclick="sincronizarAgora()">🔄 Sincronizar Quarteirões</button>
+    <button class="acao info btn-toggle-selecao" id="btnModoSelecaoBoletins" onclick="alternarModoSelecao('boletins')">🔲 Selecionar Células</button>
     <button class="acao sucesso" onclick="gerarPDF('boletins')">📄 Gerar PDF (todos)</button>
     <button class="acao" onclick="imprimir()">🖨️ Imprimir (selecionado)</button>
   </div>
@@ -1253,6 +1353,7 @@
 <div class="painel oculto" id="painel-coflagrados">
   <div class="contador" id="contadorCoflagrados"></div>
   <div class="barra-botoes-tabelas">
+    <button class="acao info btn-toggle-selecao" id="btnModoSelecaoCoflagrados" onclick="alternarModoSelecao('coflagrados')">🔲 Selecionar Células</button>
     <button class="acao" onclick="adicionarPagina('coflagrados')">➕ Nova Dupla de Tabelas</button>
     <button class="acao sucesso" onclick="gerarPDF('coflagrados')">📄 Gerar PDF</button>
     <button class="acao" onclick="imprimir()">🖨️ Imprimir</button>
@@ -1949,6 +2050,8 @@
   }
 
   function trocarAba(nome) {
+    if (typeof limparSelecaoCelulas === "function") limparSelecaoCelulas();
+    if (typeof desativarModoSelecao === "function") desativarModoSelecao();
     document.querySelectorAll(".aba").forEach(b => b.classList.toggle("ativa", b.dataset.aba === nome));
     ["diario", "semanal", "total", "informados", "andamento", "concluidos", "boletins", "resumo", "bases", "basesliraa", "coflagrados", "resumogeral"].forEach(p => {
       const el = document.getElementById("painel-" + p);
@@ -5286,7 +5389,515 @@
     reader.readAsText(file);
   }
 
+  // =========================================================================
+  // SISTEMA DE SELEÇÃO MÚLTIPLA DE CÉLULAS (DIÁRIO, BOLETINS E CONFLAGRADOS)
+  // =========================================================================
+  let celulasSelecionadas = new Set();
+  let celulaAncora = null;
+  let isDraggingSelecao = false;
+  let modoSelecaoAtivo = false;
+  let dragInicioCoord = null;
+  let touchHoldTimer = null;
+
+  function obterInfoCelula(target) {
+    if (!target) return null;
+    const td = target.closest ? target.closest("td") : null;
+    if (!td) return null;
+    const tr = td.parentElement;
+    if (!tr) return null;
+    const tbody = tr.parentElement;
+    if (!tbody || tbody.tagName !== "TBODY") return null;
+    const table = tbody.closest("table");
+    if (!table) return null;
+
+    // Restrito EXCLUSIVAMENTE às abas: Diário, Boletins e Conflagrados
+    let aba = null;
+    if (td.closest("#painel-diario")) aba = "diario";
+    else if (td.closest("#painel-boletins")) aba = "boletins";
+    else if (td.closest("#painel-coflagrados")) aba = "coflagrados";
+    else return null;
+
+    // Células não editáveis ignoradas (linhas de totais, números sequenciais, totais calculados)
+    if (tr.classList.contains("linha-total") || tr.classList.contains("dupla-rodape")) return null;
+    if (td.classList.contains("col-num-linha") || td.classList.contains("col-total") || td.classList.contains("col-t")) return null;
+
+    const inp = td.querySelector("input");
+    if (!inp || inp.readOnly || inp.disabled || inp.type === "date" || inp.dataset.formula) return null;
+
+    const rows = Array.from(tbody.rows);
+    const rowIdx = rows.indexOf(tr);
+    const colIdx = Array.from(tr.cells).indexOf(td);
+    if (rowIdx < 0 || colIdx < 0) return null;
+
+    return { td, tr, tbody, table, rowIdx, colIdx, inp, aba };
+  }
+
+  function selecionarFaixaRetangular(ancora, alvo, acumular = false) {
+    if (!ancora || !alvo || ancora.tbody !== alvo.tbody) return;
+
+    if (!acumular) {
+      celulasSelecionadas.forEach(td => td.classList.remove("celula-selecionada"));
+      celulasSelecionadas.clear();
+    }
+
+    const minR = Math.min(ancora.rowIdx, alvo.rowIdx);
+    const maxR = Math.max(ancora.rowIdx, alvo.rowIdx);
+    const minC = Math.min(ancora.colIdx, alvo.colIdx);
+    const maxC = Math.max(ancora.colIdx, alvo.colIdx);
+
+    const rows = Array.from(ancora.tbody.rows);
+    for (let r = minR; r <= maxR; r++) {
+      const row = rows[r];
+      if (!row || row.classList.contains("linha-total")) continue;
+      const cells = Array.from(row.cells);
+      for (let c = minC; c <= maxC; c++) {
+        const cell = cells[c];
+        if (!cell) continue;
+        const info = obterInfoCelula(cell);
+        if (info) {
+          info.td.classList.add("celula-selecionada");
+          celulasSelecionadas.add(info.td);
+        }
+      }
+    }
+
+    atualizarBarraFlutuanteSelecao();
+  }
+
+  function alternarSelecaoCelula(info, forceState) {
+    if (!info) return;
+    const isSelected = celulasSelecionadas.has(info.td);
+    const shouldSelect = forceState !== undefined ? forceState : !isSelected;
+
+    if (shouldSelect) {
+      info.td.classList.add("celula-selecionada");
+      celulasSelecionadas.add(info.td);
+    } else {
+      info.td.classList.remove("celula-selecionada");
+      celulasSelecionadas.delete(info.td);
+    }
+    atualizarBarraFlutuanteSelecao();
+  }
+
+  function limparSelecaoCelulas() {
+    celulasSelecionadas.forEach(td => td.classList.remove("celula-selecionada"));
+    celulasSelecionadas.clear();
+    celulaAncora = null;
+    isDraggingSelecao = false;
+    atualizarBarraFlutuanteSelecao();
+  }
+
+  function alternarModoSelecao(aba) {
+    modoSelecaoAtivo = !modoSelecaoAtivo;
+    const painel = document.getElementById("painel-" + aba);
+    if (painel) {
+      painel.classList.toggle("modo-selecao-ativo", modoSelecaoAtivo);
+    }
+    document.querySelectorAll(".btn-toggle-selecao").forEach(btn => {
+      if (modoSelecaoAtivo) {
+        btn.classList.add("ativo");
+        btn.innerHTML = `✅ Seleção Ativa (${celulasSelecionadas.size})`;
+      } else {
+        btn.classList.remove("ativo");
+        btn.innerHTML = `🔲 Selecionar Células`;
+      }
+    });
+
+    if (modoSelecaoAtivo) {
+      mostrarAviso("🔲 Modo Seleção Ativado: Toque ou arraste para selecionar várias células!");
+    } else {
+      limparSelecaoCelulas();
+      mostrarAviso("Modo Seleção Desativado.");
+    }
+  }
+
+  function desativarModoSelecao() {
+    modoSelecaoAtivo = false;
+    document.querySelectorAll(".painel").forEach(p => p.classList.remove("modo-selecao-ativo"));
+    document.querySelectorAll(".btn-toggle-selecao").forEach(btn => {
+      btn.classList.remove("ativo");
+      btn.innerHTML = `🔲 Selecionar Células`;
+    });
+  }
+
+  function limparCelulasSelecionadas() {
+    if (celulasSelecionadas.size === 0) return;
+    const count = celulasSelecionadas.size;
+    if (count > 25 && !confirm(`Deseja realmente limpar as ${count} células selecionadas?`)) return;
+
+    const quarteiroesAfetadosBoletins = new Set();
+    let alterouDiario = false;
+    let alterouCoflagrados = false;
+
+    celulasSelecionadas.forEach(td => {
+      const inp = td.querySelector("input");
+      if (!inp || inp.readOnly || inp.disabled) return;
+
+      if (inp.classList.contains("num")) {
+        inp.value = "00";
+        inp.dataset.realVazio = "1";
+        inp.classList.add("vazio-visual");
+        delete inp.dataset.usuarioDigitou;
+      } else {
+        inp.value = "";
+      }
+
+      if (inp.id && (inp.id.startsWith("ag-") || inp.id.startsWith("q-") || inp.classList.contains("num"))) {
+        alterouDiario = true;
+      }
+
+      if (inp.dataset.boletinsImovel === "1") {
+        const q = inp.dataset.quarteirao;
+        const k = inp.dataset.key;
+        const campo = inp.dataset.campo;
+        if (dadosFormularios.boletins && dadosFormularios.boletins.porQuarteirao && dadosFormularios.boletins.porQuarteirao[q]) {
+          const formQ = dadosFormularios.boletins.porQuarteirao[q];
+          if (formQ.imoveis && formQ.imoveis[k]) {
+            formQ.imoveis[k][campo] = "";
+            quarteiroesAfetadosBoletins.add(q);
+          }
+        }
+      }
+
+      if (inp.dataset.tipo === "coflagrados") {
+        const k = inp.dataset.key;
+        const campo = inp.dataset.campo;
+        if (dadosFormularios.coflagrados && dadosFormularios.coflagrados[k]) {
+          dadosFormularios.coflagrados[k][campo] = inp.classList.contains("num") ? "0" : "";
+          alterouCoflagrados = true;
+        }
+      }
+    });
+
+    if (alterouDiario) {
+      recalcular();
+      salvarComAtraso();
+    }
+
+    if (quarteiroesAfetadosBoletins.size > 0) {
+      quarteiroesAfetadosBoletins.forEach(q => {
+        const form = dadosFormularios.boletins.porQuarteirao[q];
+        const numPaginas = form ? (form.paginas || 1) : 1;
+        for (let p = 0; p < numPaginas; p++) {
+          recalcularResumoBoletins(q, p);
+        }
+        atualizarTotaisQuarteirao(q);
+      });
+      salvarFormularios();
+      salvarComAtraso();
+    }
+
+    if (alterouCoflagrados) {
+      salvarFormularios();
+      renderizarCoflagrados();
+      salvarComAtraso();
+    }
+
+    mostrarAviso(`🗑️ ${count} célula(s) limpa(s)!`);
+  }
+
+  function preencherCelulasSelecionadas() {
+    if (celulasSelecionadas.size === 0) return;
+    const count = celulasSelecionadas.size;
+    const digitado = prompt(`Digite o valor para preencher as ${count} células selecionadas:`);
+    if (digitado === null) return;
+
+    const valTrim = digitado.trim();
+    const quarteiroesAfetadosBoletins = new Set();
+    let alterouDiario = false;
+    let alterouCoflagrados = false;
+
+    celulasSelecionadas.forEach(td => {
+      const inp = td.querySelector("input");
+      if (!inp || inp.readOnly || inp.disabled) return;
+
+      if (inp.classList.contains("num")) {
+        const digitos = valTrim.replace(/\D/g, "");
+        if (digitos === "" || digitos === "0" || digitos === "00") {
+          inp.value = "00";
+          if (digitos === "") {
+            inp.dataset.realVazio = "1";
+            inp.classList.add("vazio-visual");
+          } else {
+            delete inp.dataset.realVazio;
+            inp.classList.remove("vazio-visual");
+            inp.dataset.usuarioDigitou = "1";
+          }
+        } else {
+          const n = parseInt(digitos, 10);
+          inp.value = isNaN(n) ? "00" : String(n).padStart(2, "0");
+          delete inp.dataset.realVazio;
+          inp.classList.remove("vazio-visual");
+          inp.dataset.usuarioDigitou = "1";
+        }
+      } else if (inp.id?.startsWith("q-") || inp.dataset?.campo === "q") {
+        if (/^\d+$/.test(valTrim)) {
+          inp.value = valTrim.padStart(2, "0");
+        } else {
+          inp.value = valTrim;
+        }
+      } else if (inp.dataset?.campo === "seq") {
+        inp.value = formatarSeq2Digitos(valTrim);
+      } else if (inp.dataset?.campo === "tipo") {
+        inp.value = normalizarTipoBoletim(valTrim);
+      } else {
+        inp.value = valTrim;
+      }
+
+      if (inp.id && (inp.id.startsWith("ag-") || inp.id.startsWith("q-") || inp.classList.contains("num"))) {
+        alterouDiario = true;
+      }
+
+      if (inp.dataset.boletinsImovel === "1") {
+        const q = inp.dataset.quarteirao;
+        const k = inp.dataset.key;
+        const campo = inp.dataset.campo;
+        if (dadosFormularios.boletins && dadosFormularios.boletins.porQuarteirao && dadosFormularios.boletins.porQuarteirao[q]) {
+          const formQ = dadosFormularios.boletins.porQuarteirao[q];
+          if (formQ.imoveis && formQ.imoveis[k]) {
+            formQ.imoveis[k][campo] = inp.value;
+            quarteiroesAfetadosBoletins.add(q);
+          }
+        }
+      }
+
+      if (inp.dataset.tipo === "coflagrados") {
+        const k = inp.dataset.key;
+        const campo = inp.dataset.campo;
+        if (dadosFormularios.coflagrados && dadosFormularios.coflagrados[k]) {
+          dadosFormularios.coflagrados[k][campo] = inp.value;
+          alterouCoflagrados = true;
+        }
+      }
+    });
+
+    if (alterouDiario) {
+      recalcular();
+      salvarComAtraso();
+    }
+
+    if (quarteiroesAfetadosBoletins.size > 0) {
+      quarteiroesAfetadosBoletins.forEach(q => {
+        const form = dadosFormularios.boletins.porQuarteirao[q];
+        const numPaginas = form ? (form.paginas || 1) : 1;
+        for (let p = 0; p < numPaginas; p++) {
+          recalcularResumoBoletins(q, p);
+        }
+        atualizarTotaisQuarteirao(q);
+      });
+      salvarFormularios();
+      salvarComAtraso();
+    }
+
+    if (alterouCoflagrados) {
+      salvarFormularios();
+      renderizarCoflagrados();
+      salvarComAtraso();
+    }
+
+    mostrarAviso(`✏️ ${count} célula(s) preenchida(s) com "${valTrim}"!`);
+  }
+
+  async function copiarCelulasSelecionadas() {
+    if (celulasSelecionadas.size === 0) return;
+    const mapaLinhas = new Map();
+    celulasSelecionadas.forEach(td => {
+      const tr = td.parentElement;
+      if (!mapaLinhas.has(tr)) mapaLinhas.set(tr, []);
+      mapaLinhas.get(tr).push(td);
+    });
+
+    const linhasOrdenadas = Array.from(mapaLinhas.keys()).sort((a, b) => {
+      return (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) ? -1 : 1;
+    });
+
+    const linhasTexto = [];
+    linhasOrdenadas.forEach(tr => {
+      const tds = mapaLinhas.get(tr).sort((a, b) => {
+        return (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) ? -1 : 1;
+      });
+      const vals = tds.map(td => {
+        const inp = td.querySelector("input");
+        return inp ? inp.value : td.textContent.trim();
+      });
+      linhasTexto.push(vals.join("\t"));
+    });
+
+    const textoFinal = linhasTexto.join("\n");
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(textoFinal);
+      } else {
+        throw new Error("Clipboard API indisponível");
+      }
+      mostrarAviso(`📋 ${celulasSelecionadas.size} célula(s) copiada(s)!`);
+    } catch (err) {
+      const ta = document.createElement("textarea");
+      ta.value = textoFinal;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      mostrarAviso(`📋 ${celulasSelecionadas.size} célula(s) copiada(s)!`);
+    }
+  }
+
+  function atualizarBarraFlutuanteSelecao() {
+    let barra = document.getElementById("barraFlutuanteSelecao");
+    if (!barra) {
+      barra = document.createElement("div");
+      barra.id = "barraFlutuanteSelecao";
+      barra.className = "barra-flutuante-selecao no-print";
+      barra.innerHTML = `
+        <span class="badge-contador" id="qtdCelulasSelecionadas">0 células</span>
+        <button class="btn-perigo" onclick="limparCelulasSelecionadas()">🗑️ Limpar</button>
+        <button class="btn-sucesso" onclick="preencherCelulasSelecionadas()">✏️ Preencher...</button>
+        <button onclick="copiarCelulasSelecionadas()">📋 Copiar</button>
+        <button onclick="limparSelecaoCelulas()">✕ Desmarcar</button>
+      `;
+      document.body.appendChild(barra);
+    }
+
+    const qtd = celulasSelecionadas.size;
+    const badge = document.getElementById("qtdCelulasSelecionadas");
+    if (badge) badge.textContent = `${qtd} célula${qtd > 1 ? "s" : ""} selecionada${qtd > 1 ? "s" : ""}`;
+
+    if (qtd > 1 || (qtd === 1 && modoSelecaoAtivo)) {
+      barra.style.display = "flex";
+    } else {
+      barra.style.display = "none";
+    }
+
+    document.querySelectorAll(".btn-toggle-selecao.ativo").forEach(btn => {
+      btn.innerHTML = `✅ Seleção Ativa (${qtd})`;
+    });
+  }
+
+  // Interações de Mouse (Arrasto, Shift+Clique, Ctrl+Clique)
+  document.addEventListener("mousedown", (e) => {
+    if (e.button !== 0) return;
+    if (e.target.closest("#barraFlutuanteSelecao")) return;
+    if (e.target.closest(".btn-toggle-selecao")) return;
+
+    const info = obterInfoCelula(e.target);
+    if (!info) {
+      if (!modoSelecaoAtivo && celulasSelecionadas.size > 0) {
+        limparSelecaoCelulas();
+      }
+      return;
+    }
+
+    if (e.shiftKey && celulaAncora && celulaAncora.tbody === info.tbody) {
+      e.preventDefault();
+      selecionarFaixaRetangular(celulaAncora, info, false);
+      return;
+    }
+
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      alternarSelecaoCelula(info);
+      celulaAncora = info;
+      return;
+    }
+
+    if (modoSelecaoAtivo) {
+      e.preventDefault();
+      isDraggingSelecao = true;
+      celulaAncora = info;
+      alternarSelecaoCelula(info, true);
+      return;
+    }
+
+    dragInicioCoord = { x: e.clientX, y: e.clientY };
+    celulaAncora = info;
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (!celulaAncora) return;
+
+    if (!isDraggingSelecao && dragInicioCoord && (e.buttons & 1)) {
+      const dist = Math.hypot(e.clientX - dragInicioCoord.x, e.clientY - dragInicioCoord.y);
+      if (dist > 7) {
+        isDraggingSelecao = true;
+        try { window.getSelection()?.removeAllRanges(); } catch (err) {}
+      }
+    }
+
+    if (isDraggingSelecao && (e.buttons & 1)) {
+      try { window.getSelection()?.removeAllRanges(); } catch (err) {}
+      const infoAtual = obterInfoCelula(e.target);
+      if (infoAtual && infoAtual.tbody === celulaAncora.tbody) {
+        selecionarFaixaRetangular(celulaAncora, infoAtual, false);
+      }
+    }
+  });
+
+  document.addEventListener("mouseup", (e) => {
+    dragInicioCoord = null;
+    if (isDraggingSelecao) {
+      isDraggingSelecao = false;
+      if (celulasSelecionadas.size <= 1 && !modoSelecaoAtivo) {
+        limparSelecaoCelulas();
+      }
+    }
+  });
+
+  // Interações de Toque (Mobile / Tablet)
+  document.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) return;
+    if (e.target.closest("#barraFlutuanteSelecao")) return;
+    if (e.target.closest(".btn-toggle-selecao")) return;
+
+    const info = obterInfoCelula(e.target);
+    if (!info) return;
+
+    if (modoSelecaoAtivo) {
+      e.preventDefault();
+      if (celulaAncora && celulaAncora.tbody === info.tbody && celulasSelecionadas.size === 1) {
+        selecionarFaixaRetangular(celulaAncora, info, false);
+      } else {
+        alternarSelecaoCelula(info);
+        celulaAncora = info;
+      }
+      return;
+    }
+
+    clearTimeout(touchHoldTimer);
+    touchHoldTimer = setTimeout(() => {
+      try { if (navigator.vibrate) navigator.vibrate(40); } catch (v) {}
+      alternarSelecaoCelula(info, true);
+      celulaAncora = info;
+      mostrarAviso("🔲 Célula selecionada! Toque em outra célula para selecionar o bloco.");
+    }, 350);
+  }, { passive: false });
+
+  document.addEventListener("touchend", () => { clearTimeout(touchHoldTimer); });
+  document.addEventListener("touchmove", () => { clearTimeout(touchHoldTimer); });
+
+  // Ações de Teclado
   document.addEventListener("keydown", (e) => {
+    if (celulasSelecionadas.size > 1) {
+      if (e.key === "Backspace" || e.key === "Delete") {
+        e.preventDefault();
+        limparCelulasSelecionadas();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === "c" || e.key === "C")) {
+        e.preventDefault();
+        copiarCelulasSelecionadas();
+        return;
+      }
+      if (e.key === "Escape") {
+        limparSelecaoCelulas();
+        return;
+      }
+    } else if (celulasSelecionadas.size === 1 && e.key === "Escape") {
+      limparSelecaoCelulas();
+      return;
+    }
+
     if (e.target.classList && e.target.classList.contains("num")) {
       const teclasPermitidas = ["Backspace","Delete","ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Tab","Enter","Home","End"];
       if (teclasPermitidas.includes(e.key) || e.ctrlKey || e.metaKey) return;
