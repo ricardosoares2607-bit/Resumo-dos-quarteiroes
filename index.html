@@ -1167,6 +1167,12 @@
   .barra-flutuante-selecao button.btn-sucesso:hover {
     background: #16a34a;
   }
+  .barra-flutuante-selecao button.btn-primario {
+    background: #2563eb;
+  }
+  .barra-flutuante-selecao button.btn-primario:hover {
+    background: #3b82f6;
+  }
 </style>
 </head>
 <body>
@@ -1901,15 +1907,38 @@
     atualizarBadgeNuvem(navigator.onLine);
   }
 
+  let sincronizandoNuvem = false;
+
+  function sanitizarParaFirebase(obj) {
+    if (obj === undefined) return null;
+    try {
+      return JSON.parse(JSON.stringify(obj, (key, value) => {
+        if (typeof value === "function" || value instanceof HTMLElement || value instanceof Node) {
+          return undefined;
+        }
+        return value;
+      }));
+    } catch (e) {
+      console.warn("Aviso ao sanitizar para Firebase:", e);
+      return {};
+    }
+  }
+
   function enviarDadosLocaisParaNuvem() {
     if (!nuvemAtiva || !dbRef || !navigator.onLine) return;
+    if (sincronizandoNuvem) return;
+
+    sincronizandoNuvem = true;
     try {
       const semanas = coletarDados();
-      const agora = Math.max(Date.now(), ultimoTimestampLocal + 1);
+      const agora = Math.max(Date.now(), (Number(ultimoTimestampLocal) || 0) + 1);
       ultimoTimestampLocal = agora;
       try { localStorage.setItem(STORAGE_ULTIMO_TS, String(agora)); } catch (e) {}
 
-      const payload = {
+      // Limpa flag pendente antes do despacho para evitar que ouvintes síncronos locais gerem loop recursivo
+      marcarAlteracaoPendente(false);
+
+      const payloadBruto = {
         timestamp: agora,
         semanas: semanas,
         statusQuarteiroes: statusQuarteiroes,
@@ -1920,13 +1949,20 @@
         liraaSelecionados: Array.from(quarteiroesLiraaSelecionados)
       };
 
+      const payload = sanitizarParaFirebase(payloadBruto);
+
       dbRef.set(payload).then(() => {
+        sincronizandoNuvem = false;
         marcarAlteracaoPendente(false);
         atualizarBadgeNuvem(true);
       }).catch(err => {
+        sincronizandoNuvem = false;
+        marcarAlteracaoPendente(true);
         console.warn("Falha no envio de dados locais para a nuvem:", err);
       });
     } catch (e) {
+      sincronizandoNuvem = false;
+      marcarAlteracaoPendente(true);
       console.error("Erro ao preparar dados para sincronização:", e);
     }
   }
@@ -1972,6 +2008,9 @@
     } catch (e) {}
 
     dbRef.on("value", (snapshot) => {
+      // Se estivermos ativamente no meio de um envio, este disparo é reflexo local da nossa própria gravação
+      if (sincronizandoNuvem) return;
+
       const dadosNuvem = snapshot.val();
       if (!dadosNuvem) {
         const semanasLocais = coletarDados();
@@ -1983,6 +2022,13 @@
 
       const tsRemoto = Number(dadosNuvem.timestamp) || 0;
       const tsLocal = Number(ultimoTimestampLocal) || 0;
+
+      // Se o snapshot remoto for idêntico ao nosso último timestamp local enviado, ignorar
+      if (tsRemoto > 0 && tsRemoto === tsLocal) {
+        atualizarBadgeNuvem(true);
+        return;
+      }
+
       const pendente = (function() {
         try { return localStorage.getItem(STORAGE_PENDENTE_NUVEM) === "1"; } catch (e) { return false; }
       })();
@@ -4541,28 +4587,17 @@
     });
   }
 
-  function tratarColagemBoletins(e) {
-    const target = e.target;
-    if (!(target instanceof HTMLInputElement)) return;
+  function executarColagemBoletins(target, texto) {
+    if (!target || !(target instanceof HTMLInputElement)) return;
     if (target.dataset.boletinsImovel !== '1') return;
-
-    const clipboardData = e.clipboardData || window.clipboardData;
-    if (!clipboardData) return;
-
-    const texto = clipboardData.getData('text/plain');
     if (!texto) return;
-
-    const temTab = texto.indexOf('\t') !== -1;
-    const temNovaLinha = texto.indexOf('\n') !== -1 || texto.indexOf('\r') !== -1;
-    if (!temTab && !temNovaLinha) return;
-
-    e.preventDefault();
 
     let textoNorm = texto.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     if (textoNorm.endsWith('\n')) textoNorm = textoNorm.slice(0, -1);
     const linhasTexto = textoNorm.split('\n');
     if (linhasTexto.length === 0) return;
-    const matriz = linhasTexto.map(l => l.split('\t'));
+    const separador = textoNorm.indexOf('\t') !== -1 ? '\t' : (textoNorm.indexOf(';') !== -1 ? ';' : '\t');
+    const matriz = linhasTexto.map(l => l.split(separador));
     if (matriz.length === 0) return;
 
     const qKey = target.dataset.quarteirao;
@@ -4651,20 +4686,15 @@
     renderizarFormularioBoletins();
     window.scrollTo(0, scrollY);
 
-    let msg = `✅ Colado: ${linhasPreenchidas} linha(s), ${celulasPreenchidas} célula(s)`;
+    let msg = `✅ Colado em Boletins: ${linhasPreenchidas} linha(s), ${celulasPreenchidas} célula(s)`;
     if (paginasACriar > 0) msg += ` • ${paginasACriar} nova(s) página(s)`;
     mostrarAviso(msg);
   }
 
-  function tratarColagemCoflagrados(e) {
-    const target = e.target;
+  function tratarColagemBoletins(e, inputForcado) {
+    const target = inputForcado || e.target;
     if (!(target instanceof HTMLInputElement)) return;
-    if (target.dataset.tipo !== 'coflagrados') return;
-
-    const campoInicial = target.dataset.campo;
-    const colunasOrdem = ['q', 'r', 'c', 'tb', 'pe', 'o'];
-    const colInicial = colunasOrdem.indexOf(campoInicial);
-    if (colInicial === -1) return;
+    if (target.dataset.boletinsImovel !== '1') return;
 
     const clipboardData = e.clipboardData || window.clipboardData;
     if (!clipboardData) return;
@@ -4674,15 +4704,29 @@
 
     const temTab = texto.indexOf('\t') !== -1;
     const temNovaLinha = texto.indexOf('\n') !== -1 || texto.indexOf('\r') !== -1;
-    if (!temTab && !temNovaLinha) return;
+    const temPontoEVirgula = texto.indexOf(';') !== -1;
+    if (!temTab && !temNovaLinha && !temPontoEVirgula) return;
 
     e.preventDefault();
+    executarColagemBoletins(target, texto);
+  }
+
+  function executarColagemCoflagrados(target, texto) {
+    if (!target || !(target instanceof HTMLInputElement)) return;
+    if (target.dataset.tipo !== 'coflagrados') return;
+    if (!texto) return;
+
+    const campoInicial = target.dataset.campo;
+    const colunasOrdem = ['q', 'r', 'c', 'tb', 'pe', 'o'];
+    const colInicial = colunasOrdem.indexOf(campoInicial);
+    if (colInicial === -1) return;
 
     let textoNorm = texto.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     if (textoNorm.endsWith('\n')) textoNorm = textoNorm.slice(0, -1);
     const linhasTexto = textoNorm.split('\n');
     if (linhasTexto.length === 0) return;
-    const matriz = linhasTexto.map(l => l.split('\t'));
+    const separador = textoNorm.indexOf('\t') !== -1 ? '\t' : (textoNorm.indexOf(';') !== -1 ? ';' : '\t');
+    const matriz = linhasTexto.map(l => l.split(separador));
     if (matriz.length === 0) return;
 
     const keyParts = (target.dataset.key || '').split('_');
@@ -4764,9 +4808,173 @@
     renderizarCoflagrados();
     window.scrollTo(0, scrollY);
 
-    let msg = `✅ Colado: ${linhasPreenchidas} linha(s), ${celulasPreenchidas} célula(s)`;
+    let msg = `✅ Colado em Conflagrados: ${linhasPreenchidas} linha(s), ${celulasPreenchidas} célula(s)`;
     if (paginasACriar > 0) msg += ` · ${paginasACriar} nova(s) página(s)`;
     mostrarAviso(msg);
+  }
+
+  function tratarColagemCoflagrados(e, inputForcado) {
+    const target = inputForcado || e.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    if (target.dataset.tipo !== 'coflagrados') return;
+
+    const clipboardData = e.clipboardData || window.clipboardData;
+    if (!clipboardData) return;
+
+    const texto = clipboardData.getData('text/plain');
+    if (!texto) return;
+
+    const temTab = texto.indexOf('\t') !== -1;
+    const temNovaLinha = texto.indexOf('\n') !== -1 || texto.indexOf('\r') !== -1;
+    const temPontoEVirgula = texto.indexOf(';') !== -1;
+    if (!temTab && !temNovaLinha && !temPontoEVirgula) return;
+
+    e.preventDefault();
+    executarColagemCoflagrados(target, texto);
+  }
+
+  const COLUNAS_DIARIO_ORDEM = ["ag", "q", "r", "c", "tb", "pe", "o"];
+
+  function executarColagemDiario(target, texto) {
+    if (!target || !(target instanceof HTMLInputElement)) return;
+    const match = (target.id || "").match(/^(ag|q|r|c|tb|pe|o)-(\d+)-(\d+)-(\d+)$/);
+    if (!match) return;
+
+    const prefix = match[1];
+    const idSemana = match[2];
+    const dIdx = parseInt(match[3], 10);
+    const linhaInicial = parseInt(match[4], 10);
+    const colInicial = COLUNAS_DIARIO_ORDEM.indexOf(prefix);
+    if (colInicial === -1) return;
+
+    const semanaDiv = target.closest(".semana");
+    const diaBloco = target.closest(".dia");
+
+    // Desbloqueia automaticamente a semana e a data se estiverem pendentes
+    if (semanaDiv && diaBloco) {
+      const selSem = semanaDiv.querySelector(".select-semana");
+      const inpD = diaBloco.querySelector('input[type="date"]');
+      let semanaValida = selSem && selSem.value.trim() !== "";
+      let dataValida = inpD && inpD.value.trim() !== "";
+      if (!semanaValida || !dataValida) {
+        if (!semanaValida) {
+          selSem.value = `Semana ${String(idSemana).padStart(2, "0")}`;
+        }
+        if (!dataValida) {
+          inpD.value = new Date().toISOString().slice(0, 10);
+        }
+        verificarBloqueioSemana(semanaDiv);
+      }
+    }
+
+    let textoNorm = texto.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    if (textoNorm.endsWith('\n')) textoNorm = textoNorm.slice(0, -1);
+    const linhasTexto = textoNorm.split('\n');
+    if (linhasTexto.length === 0) return;
+
+    const separador = textoNorm.indexOf('\t') !== -1 ? '\t' : (textoNorm.indexOf(';') !== -1 ? ';' : '\t');
+    const matriz = linhasTexto.map(l => l.split(separador));
+    if (matriz.length === 0) return;
+
+    let linhasPreenchidas = 0;
+    let celulasPreenchidas = 0;
+
+    for (let r = 0; r < matriz.length; r++) {
+      const targetLinha = linhaInicial + r;
+      if (targetLinha >= linhas) break; // Diário tem 20 linhas por dia
+
+      const linhaDados = matriz[r];
+      let linhaTeveDado = false;
+
+      for (let c = 0; c < linhaDados.length; c++) {
+        const colFinal = colInicial + c;
+        if (colFinal >= COLUNAS_DIARIO_ORDEM.length) break;
+
+        const colPrefix = COLUNAS_DIARIO_ORDEM[colFinal];
+        const inputId = `${colPrefix}-${idSemana}-${dIdx}-${targetLinha}`;
+        const inpAlvo = document.getElementById(inputId);
+        if (!inpAlvo || inpAlvo.readOnly || inpAlvo.disabled) continue;
+
+        let valor = linhaDados[c];
+        if (valor === undefined || valor === null) valor = '';
+        valor = String(valor).trim();
+
+        if (colPrefix === "ag") {
+          inpAlvo.value = valor;
+        } else if (colPrefix === "q") {
+          if (/^\d+$/.test(valor) && valor !== "") {
+            inpAlvo.value = valor.padStart(2, "0");
+          } else {
+            inpAlvo.value = valor;
+          }
+        } else {
+          // Colunas numéricas: r, c, tb, pe, o
+          if (valor === "" || valor === "0" || valor === "00") {
+            if (valor === "") {
+              inpAlvo.value = "00";
+              inpAlvo.dataset.realVazio = "1";
+              inpAlvo.classList.add("vazio-visual");
+              delete inpAlvo.dataset.usuarioDigitou;
+            } else {
+              inpAlvo.value = "00";
+              delete inpAlvo.dataset.realVazio;
+              inpAlvo.classList.remove("vazio-visual");
+              inpAlvo.dataset.usuarioDigitou = "1";
+            }
+          } else {
+            const digitos = valor.replace(/\D/g, "");
+            if (digitos !== "") {
+              const n = parseInt(digitos, 10);
+              inpAlvo.value = isNaN(n) ? "00" : String(n).padStart(2, "0");
+              delete inpAlvo.dataset.realVazio;
+              inpAlvo.classList.remove("vazio-visual");
+              inpAlvo.dataset.usuarioDigitou = "1";
+            } else {
+              inpAlvo.value = "00";
+              inpAlvo.dataset.realVazio = "1";
+              inpAlvo.classList.add("vazio-visual");
+              delete inpAlvo.dataset.usuarioDigitou;
+            }
+          }
+        }
+
+        celulasPreenchidas++;
+        linhaTeveDado = true;
+      }
+
+      if (linhaTeveDado) linhasPreenchidas++;
+    }
+
+    if (celulasPreenchidas > 0) {
+      recalcular();
+      atualizarResumoSemanal();
+      atualizarTotalImoveis();
+      atualizarInformados();
+      salvarComAtraso();
+      mostrarAviso(`✅ Colado no Diário: ${linhasPreenchidas} linha(s), ${celulasPreenchidas} célula(s)`);
+    } else {
+      mostrarAviso("⚠️ Nenhuma célula editável encontrada no intervalo de colagem.");
+    }
+  }
+
+  function tratarColagemDiario(e, inputForcado) {
+    const target = inputForcado || e.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    if (!target.id || !/^(ag|q|r|c|tb|pe|o)-\d+-\d+-\d+$/.test(target.id)) return;
+
+    const clipboardData = e.clipboardData || window.clipboardData;
+    if (!clipboardData) return;
+
+    const texto = clipboardData.getData('text/plain');
+    if (!texto) return;
+
+    const temTab = texto.indexOf('\t') !== -1;
+    const temNovaLinha = texto.indexOf('\n') !== -1 || texto.indexOf('\r') !== -1;
+    const temPontoEVirgula = texto.indexOf(';') !== -1;
+    if (!temTab && !temNovaLinha && !temPontoEVirgula) return;
+
+    e.preventDefault();
+    executarColagemDiario(target, texto);
   }
 
   async function gerarPDFQuarteirao(qKey) {
@@ -5088,27 +5296,8 @@
       marcarAlteracaoPendente(true);
 
       if (navigator.onLine && nuvemAtiva && dbRef) {
-        const payload = {
-          timestamp: agora,
-          semanas: semanas,
-          statusQuarteiroes: statusQuarteiroes,
-          paginas: paginas,
-          cabecalhos: cabecalhos,
-          rodapes: rodapes,
-          dadosFormularios: dadosFormularios,
-          liraaSelecionados: Array.from(quarteiroesLiraaSelecionados)
-        };
-        dbRef.set(payload)
-          .then(() => {
-            marcarAlteracaoPendente(false);
-            atualizarBadgeNuvem(true);
-            mostrarAviso("☁️ Salvo e sincronizado na nuvem!");
-          })
-          .catch(err => {
-            console.warn("Falha no envio à nuvem (offline):", err);
-            atualizarBadgeNuvem(false);
-            mostrarAviso("💾 Salvo no aparelho (offline)");
-          });
+        enviarDadosLocaisParaNuvem();
+        mostrarAviso("☁️ Salvo e sincronizado na nuvem!");
       } else {
         atualizarBadgeNuvem(false);
         mostrarAviso("💾 Salvo no aparelho (offline)");
@@ -5394,6 +5583,7 @@
   // =========================================================================
   let celulasSelecionadas = new Set();
   let celulaAncora = null;
+  let celulaFocoAtual = null;
   let isDraggingSelecao = false;
   let modoSelecaoAtivo = false;
   let dragInicioCoord = null;
@@ -5483,8 +5673,329 @@
     celulasSelecionadas.forEach(td => td.classList.remove("celula-selecionada"));
     celulasSelecionadas.clear();
     celulaAncora = null;
+    celulaFocoAtual = null;
     isDraggingSelecao = false;
     atualizarBarraFlutuanteSelecao();
+  }
+
+  function obterProximaCelulaTabela(info, direcao) {
+    if (!info || !info.tbody || !info.tr) return null;
+    const tbody = info.tbody;
+    const tr = info.tr;
+    const td = info.td;
+    const aba = info.aba;
+
+    const rows = Array.from(tbody.rows);
+    const rowIdx = rows.indexOf(tr);
+    if (rowIdx === -1) return null;
+
+    const cells = Array.from(tr.cells);
+    const colIdx = cells.indexOf(td);
+    if (colIdx === -1) return null;
+
+    function tentarAutoDesbloquear(inp) {
+      if (!inp || !inp.disabled || aba !== "diario") return;
+      const diaEl = inp.closest(".dia");
+      const semEl = inp.closest(".semana");
+      if (semEl && diaEl) {
+        const selSem = semEl.querySelector(".select-semana");
+        const inpD = diaEl.querySelector('input[type="date"]');
+        if (selSem && !selSem.value.trim()) {
+          selSem.value = `Semana ${String(semEl.dataset.semana || 1).padStart(2, "0")}`;
+        }
+        if (inpD && !inpD.value.trim()) {
+          inpD.value = new Date().toISOString().slice(0, 10);
+        }
+        verificarBloqueioSemana(semEl);
+      }
+    }
+
+    if (direcao === "down") {
+      // 1. Próxima linha no mesmo tbody
+      for (let r = rowIdx + 1; r < rows.length; r++) {
+        const targetRow = rows[r];
+        if (targetRow.classList.contains("linha-total") || targetRow.classList.contains("dupla-rodape")) continue;
+        const targetCell = targetRow.cells[colIdx];
+        if (targetCell) {
+          const inp = targetCell.querySelector("input");
+          tentarAutoDesbloquear(inp);
+          const targetInfo = obterInfoCelula(targetCell);
+          if (targetInfo && targetInfo.inp) return targetInfo;
+        }
+        for (let c = 0; c < targetRow.cells.length; c++) {
+          const cell = targetRow.cells[c];
+          const inp = cell.querySelector("input");
+          tentarAutoDesbloquear(inp);
+          const targetInfo = obterInfoCelula(cell);
+          if (targetInfo && targetInfo.inp) return targetInfo;
+        }
+      }
+
+      // 2. Se acabou a tabela no Diário: passar para o próximo dia da semana
+      if (aba === "diario") {
+        const diaAtual = td.closest(".dia");
+        const containerDias = diaAtual ? diaAtual.parentElement : null;
+        if (containerDias) {
+          const todosDias = Array.from(containerDias.querySelectorAll(".dia"));
+          const dIdx = todosDias.indexOf(diaAtual);
+          if (dIdx !== -1 && dIdx + 1 < todosDias.length) {
+            const proximoDia = todosDias[dIdx + 1];
+            const proxTbody = proximoDia.querySelector("tbody");
+            if (proxTbody && proxTbody.rows.length > 0) {
+              const firstTr = proxTbody.rows[0];
+              const targetCell = firstTr.cells[colIdx] || firstTr.cells[0];
+              if (targetCell) {
+                const inp = targetCell.querySelector("input");
+                tentarAutoDesbloquear(inp);
+                const targetInfo = obterInfoCelula(targetCell);
+                if (targetInfo && targetInfo.inp) return targetInfo;
+              }
+            }
+          }
+        }
+      }
+
+      // 3. Se for Boletins ou Conflagrados na Tabela 1: passar para a Tabela 2
+      if (aba === "boletins" || aba === "coflagrados") {
+        const metade = td.closest(".tabela-dupla-metade");
+        const containerDuplo = metade ? metade.parentElement : null;
+        if (containerDuplo) {
+          const metades = Array.from(containerDuplo.querySelectorAll(".tabela-dupla-metade"));
+          const mIdx = metades.indexOf(metade);
+          if (mIdx === 0 && metades.length > 1) {
+            const proxTbody = metades[1].querySelector("tbody");
+            if (proxTbody && proxTbody.rows.length > 0) {
+              const firstTr = proxTbody.rows[0];
+              const targetCell = firstTr.cells[colIdx] || firstTr.cells[1];
+              const targetInfo = obterInfoCelula(targetCell);
+              if (targetInfo && targetInfo.inp) return targetInfo;
+            }
+          }
+        }
+      }
+
+      return null;
+    }
+
+    if (direcao === "up") {
+      // 1. Linha anterior no mesmo tbody
+      for (let r = rowIdx - 1; r >= 0; r--) {
+        const targetRow = rows[r];
+        if (targetRow.classList.contains("linha-total") || targetRow.classList.contains("dupla-rodape")) continue;
+        const targetCell = targetRow.cells[colIdx];
+        if (targetCell) {
+          const inp = targetCell.querySelector("input");
+          tentarAutoDesbloquear(inp);
+          const targetInfo = obterInfoCelula(targetCell);
+          if (targetInfo && targetInfo.inp) return targetInfo;
+        }
+        for (let c = 0; c < targetRow.cells.length; c++) {
+          const cell = targetRow.cells[c];
+          const inp = cell.querySelector("input");
+          tentarAutoDesbloquear(inp);
+          const targetInfo = obterInfoCelula(cell);
+          if (targetInfo && targetInfo.inp) return targetInfo;
+        }
+      }
+
+      // 2. Se for Diário e estiver no topo da tabela: passar para o final do dia anterior
+      if (aba === "diario") {
+        const diaAtual = td.closest(".dia");
+        const containerDias = diaAtual ? diaAtual.parentElement : null;
+        if (containerDias) {
+          const todosDias = Array.from(containerDias.querySelectorAll(".dia"));
+          const dIdx = todosDias.indexOf(diaAtual);
+          if (dIdx > 0) {
+            const diaAnterior = todosDias[dIdx - 1];
+            const prevTbody = diaAnterior.querySelector("tbody");
+            if (prevTbody && prevTbody.rows.length > 0) {
+              const lastTr = prevTbody.rows[prevTbody.rows.length - 1];
+              const targetCell = lastTr.cells[colIdx] || lastTr.cells[0];
+              if (targetCell) {
+                const inp = targetCell.querySelector("input");
+                tentarAutoDesbloquear(inp);
+                const targetInfo = obterInfoCelula(targetCell);
+                if (targetInfo && targetInfo.inp) return targetInfo;
+              }
+            }
+          }
+        }
+      }
+
+      // 3. Se for Boletins ou Conflagrados na Tabela 2: passar para o final da Tabela 1
+      if (aba === "boletins" || aba === "coflagrados") {
+        const metade = td.closest(".tabela-dupla-metade");
+        const containerDuplo = metade ? metade.parentElement : null;
+        if (containerDuplo) {
+          const metades = Array.from(containerDuplo.querySelectorAll(".tabela-dupla-metade"));
+          const mIdx = metades.indexOf(metade);
+          if (mIdx === 1 && metades.length > 0) {
+            const prevTbody = metades[0].querySelector("tbody");
+            if (prevTbody && prevTbody.rows.length > 0) {
+              const lastTr = prevTbody.rows[prevTbody.rows.length - 1];
+              const targetCell = lastTr.cells[colIdx] || lastTr.cells[1];
+              const targetInfo = obterInfoCelula(targetCell);
+              if (targetInfo && targetInfo.inp) return targetInfo;
+            }
+          }
+        }
+      }
+
+      return null;
+    }
+
+    if (direcao === "right") {
+      // 1. Próxima célula editável na mesma linha
+      for (let c = colIdx + 1; c < cells.length; c++) {
+        const targetCell = cells[c];
+        const targetInfo = obterInfoCelula(targetCell);
+        if (targetInfo && targetInfo.inp) return targetInfo;
+      }
+
+      // 2. Se for tabela dupla na metade esquerda: passar para a metade direita na mesma linha
+      if (aba === "boletins" || aba === "coflagrados") {
+        const metade = td.closest(".tabela-dupla-metade");
+        const containerDuplo = metade ? metade.parentElement : null;
+        if (containerDuplo) {
+          const metades = Array.from(containerDuplo.querySelectorAll(".tabela-dupla-metade"));
+          const mIdx = metades.indexOf(metade);
+          if (mIdx === 0 && metades.length > 1) {
+            const proxTbody = metades[1].querySelector("tbody");
+            if (proxTbody && proxTbody.rows[rowIdx]) {
+              const altRow = proxTbody.rows[rowIdx];
+              for (let c = 0; c < altRow.cells.length; c++) {
+                const targetInfo = obterInfoCelula(altRow.cells[c]);
+                if (targetInfo && targetInfo.inp) return targetInfo;
+              }
+            }
+          }
+        }
+      }
+
+      // 3. Fim da linha: desce para a primeira célula editável da próxima linha
+      for (let r = rowIdx + 1; r < rows.length; r++) {
+        const nextRow = rows[r];
+        if (nextRow.classList.contains("linha-total") || nextRow.classList.contains("dupla-rodape")) continue;
+        for (let c = 0; c < nextRow.cells.length; c++) {
+          const targetCell = nextRow.cells[c];
+          const inp = targetCell.querySelector("input");
+          tentarAutoDesbloquear(inp);
+          const targetInfo = obterInfoCelula(targetCell);
+          if (targetInfo && targetInfo.inp) return targetInfo;
+        }
+      }
+
+      return null;
+    }
+
+    if (direcao === "left") {
+      // 1. Célula editável anterior na mesma linha
+      for (let c = colIdx - 1; c >= 0; c--) {
+        const targetCell = cells[c];
+        const targetInfo = obterInfoCelula(targetCell);
+        if (targetInfo && targetInfo.inp) return targetInfo;
+      }
+
+      // 2. Se for tabela dupla na metade direita: passar para a metade esquerda na mesma linha
+      if (aba === "boletins" || aba === "coflagrados") {
+        const metade = td.closest(".tabela-dupla-metade");
+        const containerDuplo = metade ? metade.parentElement : null;
+        if (containerDuplo) {
+          const metades = Array.from(containerDuplo.querySelectorAll(".tabela-dupla-metade"));
+          const mIdx = metades.indexOf(metade);
+          if (mIdx === 1 && metades.length > 0) {
+            const prevTbody = metades[0].querySelector("tbody");
+            if (prevTbody && prevTbody.rows[rowIdx]) {
+              const altRow = prevTbody.rows[rowIdx];
+              for (let c = altRow.cells.length - 1; c >= 0; c--) {
+                const targetInfo = obterInfoCelula(altRow.cells[c]);
+                if (targetInfo && targetInfo.inp) return targetInfo;
+              }
+            }
+          }
+        }
+      }
+
+      // 3. Início da linha: sobe para a última célula editável da linha anterior
+      for (let r = rowIdx - 1; r >= 0; r--) {
+        const prevRow = rows[r];
+        if (prevRow.classList.contains("linha-total") || prevRow.classList.contains("dupla-rodape")) continue;
+        for (let c = prevRow.cells.length - 1; c >= 0; c--) {
+          const targetCell = prevRow.cells[c];
+          const inp = targetCell.querySelector("input");
+          tentarAutoDesbloquear(inp);
+          const targetInfo = obterInfoCelula(targetCell);
+          if (targetInfo && targetInfo.inp) return targetInfo;
+        }
+      }
+
+      return null;
+    }
+
+    return null;
+  }
+
+  function navegarParaCelula(direcao) {
+    let refEl = document.activeElement;
+    let info = (refEl instanceof HTMLInputElement) ? obterInfoCelula(refEl) : null;
+
+    if (!info && celulaFocoAtual) {
+      info = celulaFocoAtual;
+    }
+    if (!info && celulaAncora) {
+      info = celulaAncora;
+    }
+    if (!info && celulasSelecionadas.size > 0) {
+      const primeiro = Array.from(celulasSelecionadas)[0];
+      info = obterInfoCelula(primeiro);
+    }
+    if (!info) return;
+
+    const prox = obterProximaCelulaTabela(info, direcao);
+    if (!prox || !prox.inp) return;
+
+    limparSelecaoCelulas();
+    celulaAncora = prox;
+    celulaFocoAtual = prox;
+    prox.inp.focus({ preventScroll: false });
+    try {
+      prox.inp.scrollIntoView({ block: "nearest", inline: "nearest" });
+      prox.inp.select();
+    } catch (err) {}
+  }
+
+  function expandirSelecaoComTeclado(direcao) {
+    let refEl = document.activeElement;
+    let info = (refEl instanceof HTMLInputElement) ? obterInfoCelula(refEl) : null;
+
+    if (!info && celulaFocoAtual) {
+      info = celulaFocoAtual;
+    }
+    if (!info && celulaAncora) {
+      info = celulaAncora;
+    }
+    if (!info && celulasSelecionadas.size > 0) {
+      const primeiro = Array.from(celulasSelecionadas)[0];
+      info = obterInfoCelula(primeiro);
+    }
+    if (!info) return;
+
+    if (!celulaAncora) {
+      celulaAncora = info;
+    }
+    if (!celulaFocoAtual) {
+      celulaFocoAtual = info;
+    }
+
+    const prox = obterProximaCelulaTabela(celulaFocoAtual, direcao);
+    if (!prox || !prox.inp) return;
+
+    celulaFocoAtual = prox;
+    selecionarFaixaRetangular(celulaAncora, celulaFocoAtual, false);
+    prox.inp.focus({ preventScroll: false });
+    try {
+      prox.inp.scrollIntoView({ block: "nearest", inline: "nearest" });
+    } catch (err) {}
   }
 
   function alternarModoSelecao(aba) {
@@ -5523,7 +6034,7 @@
   function limparCelulasSelecionadas() {
     if (celulasSelecionadas.size === 0) return;
     const count = celulasSelecionadas.size;
-    if (count > 25 && !confirm(`Deseja realmente limpar as ${count} células selecionadas?`)) return;
+    if (count > 50 && !confirm(`Deseja realmente apagar as ${count} células selecionadas?`)) return;
 
     const quarteiroesAfetadosBoletins = new Set();
     let alterouDiario = false;
@@ -5571,6 +6082,9 @@
 
     if (alterouDiario) {
       recalcular();
+      atualizarResumoSemanal();
+      atualizarTotalImoveis();
+      atualizarInformados();
       salvarComAtraso();
     }
 
@@ -5593,7 +6107,7 @@
       salvarComAtraso();
     }
 
-    mostrarAviso(`🗑️ ${count} célula(s) limpa(s)!`);
+    mostrarAviso(`🗑️ ${count} célula(s) apagada(s)!`);
   }
 
   function preencherCelulasSelecionadas() {
@@ -5744,6 +6258,55 @@
     }
   }
 
+  async function colarEmCelulasSelecionadas() {
+    let targetInp = null;
+    if (celulasSelecionadas.size > 0) {
+      const tds = Array.from(celulasSelecionadas).sort((a, b) => {
+        return (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) ? -1 : 1;
+      });
+      for (const td of tds) {
+        const inp = td.querySelector("input");
+        if (inp && !inp.readOnly && !inp.disabled) {
+          targetInp = inp;
+          break;
+        }
+      }
+    } else if (document.activeElement instanceof HTMLInputElement) {
+      targetInp = document.activeElement;
+    }
+
+    if (!targetInp) {
+      mostrarAviso("⚠️ Selecione ou clique na célula inicial onde deseja colar.");
+      return;
+    }
+
+    let texto = "";
+    try {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        texto = await navigator.clipboard.readText();
+      } else {
+        throw new Error("Clipboard readText indisponível");
+      }
+    } catch (err) {
+      texto = prompt("Cole os dados aqui (pressione Ctrl+V ou toque e segure para Colar):") || "";
+    }
+
+    if (!texto || !texto.trim()) {
+      mostrarAviso("⚠️ Área de transferência vazia ou sem texto.");
+      return;
+    }
+
+    if (targetInp.id && /^(ag|q|r|c|tb|pe|o)-\d+-\d+-\d+$/.test(targetInp.id)) {
+      executarColagemDiario(targetInp, texto);
+    } else if (targetInp.dataset.boletinsImovel === "1") {
+      executarColagemBoletins(targetInp, texto);
+    } else if (targetInp.dataset.tipo === "coflagrados") {
+      executarColagemCoflagrados(targetInp, texto);
+    } else {
+      mostrarAviso("⚠️ Célula inicial inválida para colagem.");
+    }
+  }
+
   function atualizarBarraFlutuanteSelecao() {
     let barra = document.getElementById("barraFlutuanteSelecao");
     if (!barra) {
@@ -5752,9 +6315,10 @@
       barra.className = "barra-flutuante-selecao no-print";
       barra.innerHTML = `
         <span class="badge-contador" id="qtdCelulasSelecionadas">0 células</span>
-        <button class="btn-perigo" onclick="limparCelulasSelecionadas()">🗑️ Limpar</button>
+        <button class="btn-perigo" onclick="limparCelulasSelecionadas()">🗑️ Apagar</button>
         <button class="btn-sucesso" onclick="preencherCelulasSelecionadas()">✏️ Preencher...</button>
         <button onclick="copiarCelulasSelecionadas()">📋 Copiar</button>
+        <button class="btn-primario" onclick="colarEmCelulasSelecionadas()">📥 Colar</button>
         <button onclick="limparSelecaoCelulas()">✕ Desmarcar</button>
       `;
       document.body.appendChild(barra);
@@ -5792,6 +6356,7 @@
     if (e.shiftKey && celulaAncora && celulaAncora.tbody === info.tbody) {
       e.preventDefault();
       selecionarFaixaRetangular(celulaAncora, info, false);
+      celulaFocoAtual = info;
       return;
     }
 
@@ -5799,6 +6364,7 @@
       e.preventDefault();
       alternarSelecaoCelula(info);
       celulaAncora = info;
+      celulaFocoAtual = info;
       return;
     }
 
@@ -5806,12 +6372,14 @@
       e.preventDefault();
       isDraggingSelecao = true;
       celulaAncora = info;
+      celulaFocoAtual = info;
       alternarSelecaoCelula(info, true);
       return;
     }
 
     dragInicioCoord = { x: e.clientX, y: e.clientY };
     celulaAncora = info;
+    celulaFocoAtual = info;
   });
 
   document.addEventListener("mousemove", (e) => {
@@ -5878,7 +6446,8 @@
 
   // Ações de Teclado
   document.addEventListener("keydown", (e) => {
-    if (celulasSelecionadas.size > 1) {
+    // 1. Apagar células selecionadas com Delete ou Backspace
+    if (celulasSelecionadas.size > 0) {
       if (e.key === "Backspace" || e.key === "Delete") {
         e.preventDefault();
         limparCelulasSelecionadas();
@@ -5887,6 +6456,11 @@
       if ((e.ctrlKey || e.metaKey) && (e.key === "c" || e.key === "C")) {
         e.preventDefault();
         copiarCelulasSelecionadas();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === "v" || e.key === "V")) {
+        e.preventDefault();
+        colarEmCelulasSelecionadas();
         return;
       }
       if (e.key === "Escape") {
@@ -5898,6 +6472,92 @@
       return;
     }
 
+    // 2. Navegação entre células e expansão com teclas de direção
+    const targetInput = e.target instanceof HTMLInputElement ? e.target : null;
+    const infoAtual = targetInput ? obterInfoCelula(targetInput) : (celulaFocoAtual || celulaAncora);
+
+    if (infoAtual) {
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (e.shiftKey) expandirSelecaoComTeclado("up");
+        else navegarParaCelula("up");
+        return;
+      }
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (e.shiftKey) expandirSelecaoComTeclado("down");
+        else navegarParaCelula("down");
+        return;
+      }
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (e.shiftKey) navegarParaCelula("up");
+        else navegarParaCelula("down");
+        return;
+      }
+
+      if (e.key === "Tab") {
+        e.preventDefault();
+        if (e.shiftKey) navegarParaCelula("left");
+        else navegarParaCelula("right");
+        return;
+      }
+
+      if (e.key === "ArrowLeft") {
+        if (e.shiftKey) {
+          e.preventDefault();
+          expandirSelecaoComTeclado("left");
+          return;
+        }
+        if (celulasSelecionadas.size > 1) {
+          e.preventDefault();
+          navegarParaCelula("left");
+          return;
+        }
+        if (targetInput) {
+          const start = targetInput.selectionStart;
+          const end = targetInput.selectionEnd;
+          const len = targetInput.value.length;
+          const isAtStart = (start === 0 && end === 0);
+          const isAllSelected = (start === 0 && end === len);
+          const isNum = targetInput.classList.contains("num");
+          if (isAtStart || isAllSelected || isNum) {
+            e.preventDefault();
+            navegarParaCelula("left");
+            return;
+          }
+        }
+      }
+
+      if (e.key === "ArrowRight") {
+        if (e.shiftKey) {
+          e.preventDefault();
+          expandirSelecaoComTeclado("right");
+          return;
+        }
+        if (celulasSelecionadas.size > 1) {
+          e.preventDefault();
+          navegarParaCelula("right");
+          return;
+        }
+        if (targetInput) {
+          const start = targetInput.selectionStart;
+          const end = targetInput.selectionEnd;
+          const len = targetInput.value.length;
+          const isAtEnd = (start === len && end === len);
+          const isAllSelected = (start === 0 && end === len);
+          const isNum = targetInput.classList.contains("num");
+          if (isAtEnd || isAllSelected || isNum) {
+            e.preventDefault();
+            navegarParaCelula("right");
+            return;
+          }
+        }
+      }
+    }
+
     if (e.target.classList && e.target.classList.contains("num")) {
       const teclasPermitidas = ["Backspace","Delete","ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Tab","Enter","Home","End"];
       if (teclasPermitidas.includes(e.key) || e.ctrlKey || e.metaKey) return;
@@ -5906,6 +6566,13 @@
   });
 
   document.addEventListener("focusin", (e) => {
+    const info = (e.target instanceof HTMLInputElement) ? obterInfoCelula(e.target) : null;
+    if (info) {
+      celulaFocoAtual = info;
+      if (!celulaAncora || celulasSelecionadas.size <= 1) {
+        celulaAncora = info;
+      }
+    }
     if (e.target.classList && e.target.classList.contains("num")) {
       const val = e.target.value.trim();
       if (e.target.dataset.realVazio === "1" && val === "00") {
@@ -6272,14 +6939,37 @@
   renderizarResumoGeral();
 
   document.addEventListener('paste', function(event) {
-    const target = event.target;
+    let target = event.target;
+    if (!(target instanceof HTMLInputElement)) {
+      if (celulasSelecionadas.size > 0) {
+        const tds = Array.from(celulasSelecionadas).sort((a, b) => {
+          return (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) ? -1 : 1;
+        });
+        for (const td of tds) {
+          const inp = td.querySelector("input");
+          if (inp && !inp.readOnly && !inp.disabled) {
+            target = inp;
+            break;
+          }
+        }
+      } else if (target && target.closest) {
+        const inp = target.closest("td")?.querySelector("input");
+        if (inp && !inp.readOnly && !inp.disabled) target = inp;
+      }
+    }
+
     if (!(target instanceof HTMLInputElement)) return;
+
+    if (target.id && /^(ag|q|r|c|tb|pe|o)-\d+-\d+-\d+$/.test(target.id)) {
+      tratarColagemDiario(event, target);
+      return;
+    }
     if (target.dataset.boletinsImovel === '1') {
-      tratarColagemBoletins(event);
+      tratarColagemBoletins(event, target);
       return;
     }
     if (target.dataset.tipo === 'coflagrados') {
-      tratarColagemCoflagrados(event);
+      tratarColagemCoflagrados(event, target);
       return;
     }
   });
