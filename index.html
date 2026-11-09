@@ -433,22 +433,125 @@
 
   .barra-selecao-quarteirao {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
     gap: 10px;
-    padding: 12px;
-    margin-bottom: 12px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
     background: #0277bd;
-    border-radius: 6px;
-    flex-wrap: wrap;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
   }
-  .barra-selecao-quarteirao label { color: #fff; font-weight: bold; font-size: 14px; }
+  .linha-seletor-quarteirao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .barra-selecao-quarteirao label { color: #fff; font-weight: bold; font-size: 14px; white-space: nowrap; }
   .barra-selecao-quarteirao select {
-    padding: 8px 14px; font-size: 14px; font-weight: bold;
-    border: 2px solid #fff; border-radius: 5px; background: #fff;
-    color: #333; cursor: pointer; outline: none; min-width: 280px;
+    padding: 8px 12px; font-size: 13.5px; font-weight: bold;
+    border: 2px solid #fff; border-radius: 6px; background: #fff;
+    color: #1e293b; cursor: pointer; outline: none; min-width: 320px;
+    max-width: 100%; transition: all 0.2s;
   }
   .barra-selecao-quarteirao select:focus { box-shadow: 0 0 0 3px rgba(255,255,255,0.4); }
+  .barra-selecao-quarteirao select.com-imoveis {
+    border-color: #4ade80;
+    background: #f0fdf4;
+    color: #14532d;
+  }
+  .barra-selecao-quarteirao select.sem-imoveis {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    color: #475569;
+  }
+
+  .badge-resumo-quarteirao {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  .badge-resumo-quarteirao.com-imoveis {
+    background: #e8f5e9;
+    color: #1b5e20;
+    border: 1px solid #81c784;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .badge-resumo-quarteirao.com-imoveis b {
+    color: #0e6833;
+  }
+  .badge-resumo-quarteirao.sem-imoveis {
+    background: #fff8e1;
+    color: #b78103;
+    border: 1px solid #ffe082;
+  }
+  .badge-resumo-quarteirao.neutro {
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    border: 1px dashed rgba(255,255,255,0.4);
+  }
+
+  .filtros-quarteiroes-boletins {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(255,255,255,0.25);
+    padding-top: 8px;
+    width: 100%;
+  }
+  .contador-status-quarteiroes {
+    color: #e0f2fe;
+    font-size: 12px;
+  }
+  .contador-status-quarteiroes b {
+    color: #ffffff;
+  }
+  .botoes-filtro-quarteirao {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .btn-filtro-q {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 14px;
+    padding: 4px 10px;
+    font-size: 11.5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-filtro-q:hover {
+    background: rgba(255, 255, 255, 0.35);
+  }
+  .btn-filtro-q.ativo {
+    background: #ffffff;
+    color: #0277bd;
+    border-color: #ffffff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+
+  /* Estilos para as opções dentro do select de quarteirões */
+  select#selectQuarteiraoBoletins option.opt-com-imoveis {
+    color: #15803d !important;
+    font-weight: bold !important;
+    background-color: #f0fdf4 !important;
+  }
+  select#selectQuarteiraoBoletins option.opt-sem-imoveis {
+    color: #64748b !important;
+    font-style: italic !important;
+    background-color: #ffffff !important;
+  }
 
   .bloco-quarteirao .pagina-a4 { min-height: 1080px; display: flex; flex-direction: column; }
   .bloco-quarteirao .pagina-a4 .rodape-pagina { margin-top: auto; }
@@ -888,6 +991,37 @@
     #painel-resumogeral .rodape-pagina .campo-rodape {
       flex: 1 1 100% !important;
     }
+
+    /* Barra de seleção de quarteirão nos Boletins no mobile */
+    .barra-selecao-quarteirao {
+      padding: 10px !important;
+    }
+    .linha-seletor-quarteirao {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 8px !important;
+    }
+    .barra-selecao-quarteirao select {
+      min-width: 100% !important;
+      width: 100% !important;
+      font-size: 13px !important;
+    }
+    .badge-resumo-quarteirao {
+      font-size: 11.5px !important;
+      justify-content: center !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      text-align: center !important;
+    }
+    .filtros-quarteiroes-boletins {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 8px !important;
+      text-align: center !important;
+    }
+    .botoes-filtro-quarteirao {
+      justify-content: center !important;
+    }
   }
 
   @media screen and (max-width: 480px) {
@@ -1315,10 +1449,23 @@
 <div class="painel oculto" id="painel-boletins">
   <div class="contador" id="contadorBoletins"></div>
   <div class="barra-selecao-quarteirao">
-    <label for="selectQuarteiraoBoletins">🔍 Selecionar quarteirão:</label>
-    <select id="selectQuarteiraoBoletins" onchange="selecionarQuarteiraoBoletins(this.value)">
-      <option value="">-- Selecione um quarteirão --</option>
-    </select>
+    <div class="linha-seletor-quarteirao">
+      <label for="selectQuarteiraoBoletins">🔍 Selecionar quarteirão:</label>
+      <select id="selectQuarteiraoBoletins" onchange="selecionarQuarteiraoBoletins(this.value)">
+        <option value="">-- Selecione um quarteirão --</option>
+      </select>
+      <div id="badgeResumoQuarteiraoSelecionado" class="badge-resumo-quarteirao neutro">
+        <span>Selecione um quarteirão na lista</span>
+      </div>
+    </div>
+    <div class="filtros-quarteiroes-boletins">
+      <span id="contadorStatusQuarteiroes" class="contador-status-quarteiroes"></span>
+      <div class="botoes-filtro-quarteirao">
+        <button type="button" class="btn-filtro-q ativo" data-filtro="todos" onclick="filtrarListaQuarteiroes('todos')">Todos</button>
+        <button type="button" class="btn-filtro-q" data-filtro="com" onclick="filtrarListaQuarteiroes('com')">🟢 Com imóveis</button>
+        <button type="button" class="btn-filtro-q" data-filtro="sem" onclick="filtrarListaQuarteiroes('sem')">⚪ Sem imóveis</button>
+      </div>
+    </div>
   </div>
   <div class="barra-botoes-tabelas">
     <button class="acao info" onclick="sincronizarAgora()">🔄 Sincronizar Quarteirões</button>
@@ -4048,43 +4195,214 @@
     }
   }
 
-  function popularSelectQuarteiroes() {
+  let filtroQuarteiroesBoletinsAtivo = "todos";
+
+  function calcularResumoQuarteiraoBoletins(qKey) {
+    const form = (dadosFormularios.boletins && dadosFormularios.boletins.porQuarteirao && dadosFormularios.boletins.porQuarteirao[qKey]) || {};
+    const counts = { R: 0, C: 0, TB: 0, PE: 0, O: 0 };
+    let preenchidos = 0;
+
+    const imoveis = form.imoveis || {};
+    Object.keys(imoveis).forEach(k => {
+      const l = imoveis[k];
+      if (!l) return;
+      const temDados = Boolean((l.rua && l.rua.trim()) || (l.numero && l.numero.trim()) || (l.comp && l.comp.trim()) || (l.seq && l.seq.trim()) || (l.tipo && l.tipo.trim()));
+      if (temDados) {
+        preenchidos++;
+        const tipo = String(l.tipo || "").trim().toUpperCase();
+        if (tipo && Object.prototype.hasOwnProperty.call(counts, tipo)) {
+          counts[tipo]++;
+        }
+      }
+    });
+
+    let totalResumo = 0;
+    for (let p = 0; p < (form.paginas || 1); p++) {
+      const r = (form.resumo && form.resumo[p]) || {};
+      const totPag = parseInt(r.total || "0", 10) || 0;
+      totalResumo += totPag;
+      if (preenchidos === 0) {
+        counts.R += parseInt(r.residencia || "0", 10) || 0;
+        counts.C += parseInt(r.comercio || "0", 10) || 0;
+        counts.TB += parseInt(r.terreno || "0", 10) || 0;
+        counts.PE += parseInt(r.ponto || "0", 10) || 0;
+        counts.O += parseInt(r.outros || "0", 10) || 0;
+      }
+    }
+
+    const totalFinal = Math.max(preenchidos, totalResumo);
+    const temImoveis = totalFinal > 0;
+    return {
+      R: counts.R,
+      C: counts.C,
+      TB: counts.TB,
+      PE: counts.PE,
+      O: counts.O,
+      total: totalFinal,
+      temImoveis
+    };
+  }
+
+  function formatarTextoResumoQuarteirao(r) {
+    if (!r || !r.temImoveis) return "0 imóveis (vazio)";
+    const partes = [];
+    if (r.R > 0) partes.push(`R:${r.R}`);
+    if (r.C > 0) partes.push(`C:${r.C}`);
+    if (r.TB > 0) partes.push(`TB:${r.TB}`);
+    if (r.PE > 0) partes.push(`PE:${r.PE}`);
+    if (r.O > 0) partes.push(`O:${r.O}`);
+    if (partes.length === 0) return `${r.total} imóvel(is)`;
+    return `${r.total} imóvel(is) [${partes.join(', ')}]`;
+  }
+
+  function atualizarOptionQuarteirao(qKey) {
+    const sel = document.getElementById("selectQuarteiraoBoletins");
+    if (!sel) return;
+    const opt = Array.from(sel.options).find(o => o.value === qKey);
+    if (!opt) return;
+    const r = calcularResumoQuarteiraoBoletins(qKey);
+    const nomeQ = qKey === "_legacy" ? "Sem quarteirão (legado)" : `Quarteirão ${formatarIdentificador2Digitos(qKey)}`;
+    if (r.temImoveis) {
+      opt.textContent = `🟢 ${nomeQ} — ${formatarTextoResumoQuarteirao(r)}`;
+      opt.className = "opt-com-imoveis";
+      opt.style.color = "#15803d";
+      opt.style.fontWeight = "bold";
+      opt.style.backgroundColor = "#f0fdf4";
+    } else {
+      opt.textContent = `⚪ ${nomeQ} — (Sem imóveis atribuídos)`;
+      opt.className = "opt-sem-imoveis";
+      opt.style.color = "#64748b";
+      opt.style.fontStyle = "italic";
+      opt.style.backgroundColor = "#ffffff";
+    }
+  }
+
+  function atualizarBadgeResumoQuarteiraoSelecionado(qKey) {
+    const badge = document.getElementById("badgeResumoQuarteiraoSelecionado");
+    const sel = document.getElementById("selectQuarteiraoBoletins");
+    if (!badge) return;
+
+    if (!qKey) {
+      badge.className = "badge-resumo-quarteirao neutro";
+      badge.innerHTML = `<span>Selecione um quarteirão na lista</span>`;
+      if (sel) {
+        sel.classList.remove("com-imoveis", "sem-imoveis");
+      }
+      return;
+    }
+
+    const r = calcularResumoQuarteiraoBoletins(qKey);
+    const nomeQ = qKey === "_legacy" ? "Legado" : `Quarteirão ${formatarIdentificador2Digitos(qKey)}`;
+
+    if (r.temImoveis) {
+      badge.className = "badge-resumo-quarteirao com-imoveis";
+      const tipos = [];
+      if (r.R > 0) tipos.push(`R: <b>${r.R}</b>`);
+      if (r.C > 0) tipos.push(`C: <b>${r.C}</b>`);
+      if (r.TB > 0) tipos.push(`TB: <b>${r.TB}</b>`);
+      if (r.PE > 0) tipos.push(`PE: <b>${r.PE}</b>`);
+      if (r.O > 0) tipos.push(`O: <b>${r.O}</b>`);
+      const detalheTipos = tipos.length > 0 ? ` (${tipos.join(" · ")})` : "";
+
+      badge.innerHTML = `
+        <span class="icone-status">🟢</span>
+        <span class="quarteirao-nome" style="color: #15803d; font-weight: bold;">${nomeQ}:</span>
+        <span class="resumo-dados"><b>${r.total} imóvel(is) atribuído(s)</b>${detalheTipos}</span>
+      `;
+      if (sel) {
+        sel.classList.add("com-imoveis");
+        sel.classList.remove("sem-imoveis");
+      }
+    } else {
+      badge.className = "badge-resumo-quarteirao sem-imoveis";
+      badge.innerHTML = `
+        <span class="icone-status">⚪</span>
+        <span class="quarteirao-nome" style="color: #854d0e; font-weight: bold;">${nomeQ}:</span>
+        <span class="resumo-dados">Nenhum imóvel atribuído ainda</span>
+      `;
+      if (sel) {
+        sel.classList.add("sem-imoveis");
+        sel.classList.remove("com-imoveis");
+      }
+    }
+  }
+
+  function popularSelectQuarteiroes(filtro = null) {
+    if (filtro !== null) {
+      filtroQuarteiroesBoletinsAtivo = filtro;
+    }
     const sel = document.getElementById("selectQuarteiraoBoletins");
     if (!sel) return;
     const pQ = (dadosFormularios.boletins && dadosFormularios.boletins.porQuarteirao) || {};
-    const chaves = Object.keys(pQ).sort((a, b) => {
+    const todasChaves = Object.keys(pQ).sort((a, b) => {
       if (a === "_legacy") return 1;
       if (b === "_legacy") return -1;
       return a.localeCompare(b, "pt-BR", { numeric: true });
     });
 
+    let comImoveisCount = 0;
+    let semImoveisCount = 0;
+
+    const resumos = {};
+    todasChaves.forEach(q => {
+      const r = calcularResumoQuarteiraoBoletins(q);
+      resumos[q] = r;
+      if (r.temImoveis) comImoveisCount++;
+      else semImoveisCount++;
+    });
+
+    const contadorFiltroEl = document.getElementById("contadorStatusQuarteiroes");
+    if (contadorFiltroEl) {
+      contadorFiltroEl.innerHTML = `📊 <b>${comImoveisCount}</b> com imóveis · <b>${semImoveisCount}</b> sem imóveis (total: <b>${todasChaves.length}</b>)`;
+    }
+
+    document.querySelectorAll(".btn-filtro-q").forEach(btn => {
+      if (btn.dataset.filtro === filtroQuarteiroesBoletinsAtivo) {
+        btn.classList.add("ativo");
+      } else {
+        btn.classList.remove("ativo");
+      }
+    });
+
+    const chavesFiltradas = todasChaves.filter(q => {
+      if (filtroQuarteiroesBoletinsAtivo === "com") return resumos[q].temImoveis;
+      if (filtroQuarteiroesBoletinsAtivo === "sem") return !resumos[q].temImoveis;
+      return true;
+    });
+
     sel.innerHTML = `<option value="">-- Selecione um quarteirão --</option>`;
-    chaves.forEach(q => {
+    chavesFiltradas.forEach(q => {
       const opt = document.createElement("option");
       opt.value = q;
-      opt.textContent = q === "_legacy" ? "Sem quarteirão (legado)" : `Quarteirão ${formatarIdentificador2Digitos(q)}`;
+      const nomeQ = q === "_legacy" ? "Sem quarteirão (legado)" : `Quarteirão ${formatarIdentificador2Digitos(q)}`;
+      const r = resumos[q];
+
+      if (r.temImoveis) {
+        opt.textContent = `🟢 ${nomeQ} — ${formatarTextoResumoQuarteirao(r)}`;
+        opt.className = "opt-com-imoveis";
+        opt.style.color = "#15803d";
+        opt.style.fontWeight = "bold";
+        opt.style.backgroundColor = "#f0fdf4";
+      } else {
+        opt.textContent = `⚪ ${nomeQ} — (Sem imóveis atribuídos)`;
+        opt.className = "opt-sem-imoveis";
+        opt.style.color = "#64748b";
+        opt.style.fontStyle = "italic";
+        opt.style.backgroundColor = "#ffffff";
+      }
       sel.appendChild(opt);
     });
 
-    if (quarteiraoBoletinsSelecionado && chaves.indexOf(quarteiraoBoletinsSelecionado) !== -1) {
+    if (quarteiraoBoletinsSelecionado && chavesFiltradas.indexOf(quarteiraoBoletinsSelecionado) !== -1) {
       sel.value = quarteiraoBoletinsSelecionado;
-      return;
-    }
-
-    let saved = null;
-    try { saved = localStorage.getItem(STORAGE_SELECAO_BOLETINS); } catch (e) {}
-
-    if (saved !== null) {
-      if (saved && chaves.indexOf(saved) !== -1) {
+    } else {
+      let saved = null;
+      try { saved = localStorage.getItem(STORAGE_SELECAO_BOLETINS); } catch (e) {}
+      if (saved && chavesFiltradas.indexOf(saved) !== -1) {
         quarteiraoBoletinsSelecionado = saved;
         sel.value = saved;
-      } else {
-        quarteiraoBoletinsSelecionado = "";
-        sel.value = "";
-      }
-    } else {
-      if (chaves.length > 0) {
-        const primeiro = chaves.find(q => q !== "_legacy") || chaves[0];
+      } else if (chavesFiltradas.length > 0) {
+        const primeiro = chavesFiltradas.find(q => q !== "_legacy") || chavesFiltradas[0];
         quarteiraoBoletinsSelecionado = primeiro;
         sel.value = primeiro;
         try { localStorage.setItem(STORAGE_SELECAO_BOLETINS, primeiro); } catch (e) {}
@@ -4092,13 +4410,21 @@
         quarteiraoBoletinsSelecionado = "";
         sel.value = "";
       }
+      aplicarVisibilidadeQuarteirao();
     }
+
+    atualizarBadgeResumoQuarteiraoSelecionado(quarteiraoBoletinsSelecionado);
+  }
+
+  function filtrarListaQuarteiroes(filtro) {
+    popularSelectQuarteiroes(filtro);
   }
 
   function selecionarQuarteiraoBoletins(qKey) {
     quarteiraoBoletinsSelecionado = String(qKey || "");
     try { localStorage.setItem(STORAGE_SELECAO_BOLETINS, quarteiraoBoletinsSelecionado); } catch (e) {}
     aplicarVisibilidadeQuarteirao();
+    atualizarBadgeResumoQuarteiraoSelecionado(quarteiraoBoletinsSelecionado);
   }
 
   function aplicarVisibilidadeQuarteirao() {
@@ -4195,6 +4521,10 @@
         O: ${String(totals.O).padStart(2, "0")} |
         <b>Total: ${String(totals.total).padStart(2, "0")}</b>
       `;
+    }
+    atualizarOptionQuarteirao(qKey);
+    if (quarteiraoBoletinsSelecionado === qKey) {
+      atualizarBadgeResumoQuarteiraoSelecionado(qKey);
     }
   }
 
