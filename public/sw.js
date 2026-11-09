@@ -1,5 +1,5 @@
 // Service Worker para Andamento dos quarteirões - PWA (100% Offline-Ready)
-const CACHE_NAME = 'andamento-quarteiroes-v3';
+const CACHE_NAME = 'andamento-quarteiroes-v4';
 
 const STATIC_ASSETS = [
   '/',
@@ -7,6 +7,8 @@ const STATIC_ASSETS = [
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
+  '/icon-maskable-192.png',
+  '/icon-maskable-512.png',
   '/apple-touch-icon.png',
   '/favicon.png',
   '/libs/firebase-app-compat.js',
@@ -80,9 +82,30 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Estratégia para scripts, bibliotecas, imagens e assets: Cache First com fallback de rede
+  // Ícones e Manifesto: Network-First com fallback de cache para garantir que atualizações apareçam de imediato
+  const isIconOrManifest = url.pathname.includes('icon') || url.pathname.includes('favicon') || url.pathname.includes('manifest.json');
+  if (isIconOrManifest) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+          }
+          return networkResponse;
+        })
+        .catch(async () => {
+          const cached = await caches.match(event.request, { ignoreSearch: true });
+          if (cached) return cached;
+          return new Response('', { status: 404 });
+        })
+    );
+    return;
+  }
+
+  // Estratégia para demais scripts, bibliotecas e assets estáticos: Cache First com fallback de rede
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
+    caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
       if (cachedResponse) {
         return cachedResponse;
       }
