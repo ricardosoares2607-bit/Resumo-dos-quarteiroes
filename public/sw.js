@@ -1,5 +1,5 @@
 // Service Worker para Andamento dos quarteirões - PWA (100% Offline-Ready)
-const CACHE_NAME = 'andamento-quarteiroes-v2';
+const CACHE_NAME = 'andamento-quarteiroes-v3';
 
 const STATIC_ASSETS = [
   '/',
