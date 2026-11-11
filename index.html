@@ -467,35 +467,247 @@
     background: #f8fafc;
     color: #475569;
   }
+  .barra-selecao-quarteirao select.divergente {
+    border-color: #f87171 !important;
+    background: #fef2f2 !important;
+    color: #991b1b !important;
+  }
 
   .badge-resumo-quarteirao {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12.5px;
-    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 8px;
+    font-size: 13px;
     transition: all 0.2s ease;
   }
-  .badge-resumo-quarteirao.com-imoveis {
-    background: #e8f5e9;
-    color: #1b5e20;
-    border: 1px solid #81c784;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  }
-  .badge-resumo-quarteirao.com-imoveis b {
-    color: #0e6833;
-  }
-  .badge-resumo-quarteirao.sem-imoveis {
-    background: #fff8e1;
-    color: #b78103;
-    border: 1px solid #ffe082;
-  }
   .badge-resumo-quarteirao.neutro {
+    padding: 10px 14px;
     background: rgba(255,255,255,0.18);
     color: #fff;
     border: 1px dashed rgba(255,255,255,0.4);
+    text-align: center;
+  }
+  .badge-resumo-quarteirao.com-imoveis,
+  .badge-resumo-quarteirao.sem-imoveis,
+  .badge-resumo-quarteirao.divergente,
+  .badge-resumo-quarteirao.conferido,
+  .badge-resumo-quarteirao.apenas-boletim {
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  /* Cartão comparativo detalhado Boletim x Concluídos */
+  .card-comparativo-quarteirao {
+    width: 100%;
+    box-sizing: border-box;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  .card-comparativo-quarteirao.divergente {
+    border: 2px solid #ef4444;
+  }
+  .card-comparativo-quarteirao.conferido {
+    border: 2px solid #22c55e;
+  }
+  .card-comparativo-quarteirao.apenas-boletim {
+    border: 2px solid #0284c7;
+  }
+  .card-comparativo-quarteirao.sem-imoveis {
+    border: 1px dashed #cbd5e1;
+    background: #f8fafc;
+  }
+
+  .comparativo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .comparativo-header.divergente {
+    background: #fee2e2;
+    border-bottom: 1px solid #fecaca;
+    color: #991b1b;
+  }
+  .comparativo-header.conferido {
+    background: #dcfce7;
+    border-bottom: 1px solid #bbf7d0;
+    color: #14532d;
+  }
+  .comparativo-header.apenas-boletim {
+    background: #e0f2fe;
+    border-bottom: 1px solid #bae6fd;
+    color: #0369a1;
+  }
+  .comparativo-header.sem-imoveis {
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+    color: #475569;
+  }
+
+  .comparativo-header-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+  .comparativo-header-pill {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .comparativo-header-pill.alerta {
+    background: #ef4444;
+    color: #ffffff;
+  }
+  .comparativo-header-pill.sucesso {
+    background: #16a34a;
+    color: #ffffff;
+  }
+  .comparativo-header-pill.info {
+    background: #0284c7;
+    color: #ffffff;
+  }
+
+  /* Tabela do comparativo */
+  .comparativo-tabela-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background: #ffffff;
+  }
+  .tabela-comparativo-concluidos {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    color: #1e293b;
+    margin: 0;
+  }
+  .tabela-comparativo-concluidos th {
+    background: #f1f5f9;
+    color: #334155;
+    font-weight: 700;
+    text-align: center;
+    padding: 7px 10px;
+    border-bottom: 1px solid #cbd5e1;
+    font-size: 11.5px;
+    white-space: nowrap;
+  }
+  .tabela-comparativo-concluidos th.col-th-tipo {
+    text-align: left;
+    padding-left: 14px;
+  }
+  .tabela-comparativo-concluidos td {
+    padding: 7px 10px;
+    text-align: center;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+  }
+  .tabela-comparativo-concluidos td.col-tipo {
+    text-align: left;
+    padding-left: 14px;
+    font-weight: 600;
+  }
+  .tabela-comparativo-concluidos tr.linha-divergente {
+    background-color: #fef2f2 !important;
+  }
+  .tabela-comparativo-concluidos tr.linha-divergente td {
+    color: #991b1b;
+  }
+  .tabela-comparativo-concluidos tr.linha-divergente td.col-tipo {
+    border-left: 4px solid #ef4444;
+    color: #991b1b;
+    font-weight: 700;
+  }
+  .tabela-comparativo-concluidos tr.linha-conferida:hover {
+    background-color: #f8fafc;
+  }
+  .tabela-comparativo-concluidos tr.linha-total-comparativo {
+    background-color: #f8fafc;
+    border-top: 2px solid #cbd5e1;
+    font-weight: 700;
+  }
+  .tabela-comparativo-concluidos tr.linha-total-comparativo.linha-divergente {
+    background-color: #fee2e2 !important;
+  }
+  .tabela-comparativo-concluidos .val-num {
+    display: inline-block;
+    min-width: 28px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .tabela-comparativo-concluidos .val-boletim {
+    background: #e0f2fe;
+    color: #0369a1;
+  }
+  .tabela-comparativo-concluidos .val-concluidos {
+    background: #dcfce7;
+    color: #15803d;
+  }
+  .tabela-comparativo-concluidos .tag-comp {
+    font-family: monospace;
+    font-weight: 700;
+    color: #475569;
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11.5px;
+    white-space: nowrap;
+  }
+  .tabela-comparativo-concluidos tr.linha-divergente .tag-comp {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+  }
+  .badge-divergencia-alerta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #f87171;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .badge-igual-sucesso {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #dcfce7;
+    color: #15803d;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .comparativo-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    font-size: 11.5px;
+    color: #64748b;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
   .filtros-quarteiroes-boletins {
@@ -540,8 +752,30 @@
     border-color: #ffffff;
     box-shadow: 0 1px 4px rgba(0,0,0,0.15);
   }
+  .btn-filtro-q.btn-alerta-divergencia {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #f87171;
+    font-weight: 800;
+  }
+  .btn-filtro-q.btn-alerta-divergencia.ativo {
+    background: #dc2626 !important;
+    color: #ffffff !important;
+    border-color: #991b1b !important;
+    box-shadow: 0 1px 4px rgba(220,38,38,0.4);
+  }
 
   /* Estilos para as opções dentro do select de quarteirões */
+  select#selectQuarteiraoBoletins option.opt-divergente {
+    color: #b91c1c !important;
+    font-weight: bold !important;
+    background-color: #fef2f2 !important;
+  }
+  select#selectQuarteiraoBoletins option.opt-conferido {
+    color: #15803d !important;
+    font-weight: bold !important;
+    background-color: #f0fdf4 !important;
+  }
   select#selectQuarteiraoBoletins option.opt-com-imoveis {
     color: #15803d !important;
     font-weight: bold !important;
@@ -1008,10 +1242,49 @@
     }
     .badge-resumo-quarteirao {
       font-size: 11.5px !important;
-      justify-content: center !important;
       width: 100% !important;
       box-sizing: border-box !important;
+    }
+    .badge-resumo-quarteirao.neutro {
       text-align: center !important;
+    }
+    .card-comparativo-quarteirao {
+      border-radius: 6px !important;
+    }
+    .comparativo-header {
+      padding: 8px 10px !important;
+      gap: 6px !important;
+    }
+    .comparativo-header-titulo {
+      font-size: 12.5px !important;
+    }
+    .comparativo-header-sub {
+      font-size: 10.5px !important;
+    }
+    .comparativo-header-pill {
+      font-size: 10px !important;
+      padding: 3px 8px !important;
+    }
+    .tabela-comparativo-concluidos th,
+    .tabela-comparativo-concluidos td {
+      padding: 5px 6px !important;
+      font-size: 11px !important;
+    }
+    .tabela-comparativo-concluidos th.col-th-tipo,
+    .tabela-comparativo-concluidos td.col-tipo {
+      padding-left: 8px !important;
+    }
+    .badge-divergencia-alerta,
+    .badge-igual-sucesso {
+      font-size: 10px !important;
+      padding: 2px 6px !important;
+    }
+    .comparativo-footer {
+      padding: 6px 10px !important;
+      font-size: 10.5px !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 4px !important;
     }
     .filtros-quarteiroes-boletins {
       flex-direction: column !important;
@@ -1454,14 +1727,16 @@
       <select id="selectQuarteiraoBoletins" onchange="selecionarQuarteiraoBoletins(this.value)">
         <option value="">-- Selecione um quarteirão --</option>
       </select>
-      <div id="badgeResumoQuarteiraoSelecionado" class="badge-resumo-quarteirao neutro">
-        <span>Selecione um quarteirão na lista</span>
-      </div>
+    </div>
+    <div id="badgeResumoQuarteiraoSelecionado" class="badge-resumo-quarteirao neutro">
+      <span>Selecione um quarteirão na lista acima para visualizar os imóveis e o comparativo</span>
     </div>
     <div class="filtros-quarteiroes-boletins">
       <span id="contadorStatusQuarteiroes" class="contador-status-quarteiroes"></span>
       <div class="botoes-filtro-quarteirao">
         <button type="button" class="btn-filtro-q ativo" data-filtro="todos" onclick="filtrarListaQuarteiroes('todos')">Todos</button>
+        <button type="button" class="btn-filtro-q btn-alerta-divergencia" data-filtro="divergentes" onclick="filtrarListaQuarteiroes('divergentes')">⚠️ Com divergência</button>
+        <button type="button" class="btn-filtro-q" data-filtro="conferidos" onclick="filtrarListaQuarteiroes('conferidos')">✅ Conferidos</button>
         <button type="button" class="btn-filtro-q" data-filtro="com" onclick="filtrarListaQuarteiroes('com')">🟢 Com imóveis</button>
         <button type="button" class="btn-filtro-q" data-filtro="sem" onclick="filtrarListaQuarteiroes('sem')">⚪ Sem imóveis</button>
       </div>
@@ -4199,7 +4474,7 @@
 
   function calcularResumoQuarteiraoBoletins(qKey) {
     const form = (dadosFormularios.boletins && dadosFormularios.boletins.porQuarteirao && dadosFormularios.boletins.porQuarteirao[qKey]) || {};
-    const counts = { R: 0, C: 0, TB: 0, PE: 0, O: 0 };
+    const countsImoveis = { R: 0, C: 0, TB: 0, PE: 0, O: 0 };
     let preenchidos = 0;
 
     const imoveis = form.imoveis || {};
@@ -4210,27 +4485,31 @@
       if (temDados) {
         preenchidos++;
         const tipo = String(l.tipo || "").trim().toUpperCase();
-        if (tipo && Object.prototype.hasOwnProperty.call(counts, tipo)) {
-          counts[tipo]++;
+        if (tipo && Object.prototype.hasOwnProperty.call(countsImoveis, tipo)) {
+          countsImoveis[tipo]++;
         }
       }
     });
+    const totalImoveisCounts = countsImoveis.R + countsImoveis.C + countsImoveis.TB + countsImoveis.PE + countsImoveis.O;
 
-    let totalResumo = 0;
+    const countsResumo = { R: 0, C: 0, TB: 0, PE: 0, O: 0, total: 0 };
     for (let p = 0; p < (form.paginas || 1); p++) {
       const r = (form.resumo && form.resumo[p]) || {};
-      const totPag = parseInt(r.total || "0", 10) || 0;
-      totalResumo += totPag;
-      if (preenchidos === 0) {
-        counts.R += parseInt(r.residencia || "0", 10) || 0;
-        counts.C += parseInt(r.comercio || "0", 10) || 0;
-        counts.TB += parseInt(r.terreno || "0", 10) || 0;
-        counts.PE += parseInt(r.ponto || "0", 10) || 0;
-        counts.O += parseInt(r.outros || "0", 10) || 0;
-      }
+      countsResumo.R += parseInt(r.residencia || "0", 10) || 0;
+      countsResumo.C += parseInt(r.comercio || "0", 10) || 0;
+      countsResumo.TB += parseInt(r.terreno || "0", 10) || 0;
+      countsResumo.PE += parseInt(r.ponto || "0", 10) || 0;
+      countsResumo.O += parseInt(r.outros || "0", 10) || 0;
+      countsResumo.total += parseInt(r.total || "0", 10) || 0;
     }
+    const totalResumoSoma = countsResumo.R + countsResumo.C + countsResumo.TB + countsResumo.PE + countsResumo.O;
+    if (countsResumo.total < totalResumoSoma) countsResumo.total = totalResumoSoma;
 
-    const totalFinal = Math.max(preenchidos, totalResumo);
+    const counts = (totalImoveisCounts >= totalResumoSoma && totalImoveisCounts > 0)
+      ? countsImoveis
+      : countsResumo;
+
+    const totalFinal = Math.max(preenchidos, totalImoveisCounts, countsResumo.total, counts.R + counts.C + counts.TB + counts.PE + counts.O);
     const temImoveis = totalFinal > 0;
     return {
       R: counts.R,
@@ -4243,6 +4522,158 @@
     };
   }
 
+  function normalizarChaveQuarteirao(val) {
+    if (val === null || val === undefined) return "";
+    let s = String(val).trim();
+    if (s === "_legacy") return "_legacy";
+    s = s.replace(/^quarteir[aã]o\s*/i, "").trim();
+    if (/^\d+$/.test(s)) {
+      const n = parseInt(s, 10);
+      return isNaN(n) ? s : String(n);
+    }
+    return s.toLowerCase();
+  }
+
+  function obterDadosConcluidosParaQuarteirao(qKey) {
+    const normTarget = normalizarChaveQuarteirao(qKey);
+    if (!normTarget) return null;
+
+    const mapa = coletarQuarteiroesAgrupados();
+    let encontrou = false;
+    let estaConcluido = false;
+    const soma = { R: 0, C: 0, TB: 0, PE: 0, O: 0 };
+    let chaveEncontrada = "";
+
+    Object.keys(mapa).forEach(k => {
+      if (normalizarChaveQuarteirao(k) === normTarget) {
+        encontrou = true;
+        chaveEncontrada = k;
+        if (statusQuarteiroes[k] === "concluido") {
+          estaConcluido = true;
+        }
+        const item = mapa[k];
+        soma.R += parseInt(String(item.R || 0).replace(/\D/g, ""), 10) || 0;
+        soma.C += parseInt(String(item.C || 0).replace(/\D/g, ""), 10) || 0;
+        soma.TB += parseInt(String(item.TB || 0).replace(/\D/g, ""), 10) || 0;
+        soma.PE += parseInt(String(item.PE || 0).replace(/\D/g, ""), 10) || 0;
+        soma.O += parseInt(String(item.O || 0).replace(/\D/g, ""), 10) || 0;
+      }
+    });
+
+    if (!encontrou) return null;
+
+    const total = soma.R + soma.C + soma.TB + soma.O;
+    return {
+      encontrou: true,
+      estaConcluido,
+      chaveEncontrada,
+      R: soma.R,
+      C: soma.C,
+      TB: soma.TB,
+      PE: soma.PE,
+      O: soma.O,
+      total: total
+    };
+  }
+
+  function compararBoletimComConcluidos(qKey) {
+    const dadosB = calcularResumoQuarteiraoBoletins(qKey);
+    const dadosC = obterDadosConcluidosParaQuarteirao(qKey);
+
+    if (!dadosB.temImoveis && (!dadosC || dadosC.total === 0)) {
+      return {
+        status: "sem_dados",
+        dadosBoletim: dadosB,
+        dadosConcluidos: dadosC,
+        divergencias: [],
+        comparativoCampos: [],
+        temDivergencia: false,
+        temConcluidos: Boolean(dadosC),
+        conferido: false
+      };
+    }
+
+    if (!dadosC) {
+      return {
+        status: "apenas_boletim",
+        dadosBoletim: dadosB,
+        dadosConcluidos: null,
+        divergencias: [],
+        comparativoCampos: [],
+        temDivergencia: false,
+        temConcluidos: false,
+        conferido: false
+      };
+    }
+
+    if (!dadosB.temImoveis && dadosC.total > 0) {
+      const divergenciaTotal = {
+        campo: "total",
+        sigla: "Total",
+        label: "Total Geral",
+        valB: 0,
+        valC: dadosC.total,
+        diff: -dadosC.total,
+        divergente: true
+      };
+      return {
+        status: "divergente",
+        dadosBoletim: dadosB,
+        dadosConcluidos: dadosC,
+        divergencias: [divergenciaTotal],
+        comparativoCampos: [divergenciaTotal],
+        temDivergencia: true,
+        temConcluidos: true,
+        conferido: false
+      };
+    }
+
+    const camposDef = [
+      { campo: "R", sigla: "R", label: "Residencial (R)", valB: dadosB.R, valC: dadosC.R },
+      { campo: "C", sigla: "C", label: "Comércio (C)", valB: dadosB.C, valC: dadosC.C },
+      { campo: "TB", sigla: "TB", label: "Terreno Baldio (TB)", valB: dadosB.TB, valC: dadosC.TB },
+      { campo: "PE", sigla: "PE", label: "Ponto Estratégico (PE)", valB: dadosB.PE, valC: dadosC.PE },
+      { campo: "O", sigla: "O", label: "Outros (O)", valB: dadosB.O, valC: dadosC.O },
+      { campo: "total", sigla: "Total", label: "Total Geral", valB: dadosB.total, valC: dadosC.total }
+    ];
+
+    const divergencias = [];
+    const comparativoCampos = [];
+
+    camposDef.forEach(item => {
+      if (item.campo === "PE" && item.valB === 0 && item.valC === 0) {
+        return;
+      }
+      const diff = item.valB - item.valC;
+      const divergente = (item.valB !== item.valC);
+      const obj = {
+        campo: item.campo,
+        sigla: item.sigla,
+        label: item.label,
+        valB: item.valB,
+        valC: item.valC,
+        diff: diff,
+        divergente: divergente
+      };
+      comparativoCampos.push(obj);
+      if (divergente) {
+        divergencias.push(obj);
+      }
+    });
+
+    const temDivergencia = divergencias.length > 0;
+    return {
+      status: temDivergencia ? "divergente" : "conferido",
+      dadosBoletim: dadosB,
+      dadosConcluidos: dadosC,
+      divergencias,
+      comparativoCampos,
+      temDivergencia,
+      temConcluidos: true,
+      conferido: !temDivergencia
+    };
+  }
+
   function formatarTextoResumoQuarteirao(r) {
     if (!r || !r.temImoveis) return "0 imóveis (vazio)";
     const partes = [];
@@ -4252,7 +4683,34 @@
     if (r.PE > 0) partes.push(`PE:${r.PE}`);
     if (r.O > 0) partes.push(`O:${r.O}`);
     if (partes.length === 0) return `${r.total} imóvel(is)`;
-    return `${r.total} imóvel(is) [${partes.join(', ')}]`;
+    return `${r.total} imóveis [${partes.join(', ')}]`;
+  }
+
+  function formatarTextoOptionComComparativo(qKey, r, comp) {
+    const nomeQ = qKey === "_legacy" ? "Sem quarteirão (legado)" : `Quarteirão ${formatarIdentificador2Digitos(qKey)}`;
+    if (!r.temImoveis && (!comp || !comp.temConcluidos || comp.dadosConcluidos.total === 0)) {
+      return `⚪ ${nomeQ} — (Sem imóveis atribuídos)`;
+    }
+    if (!r.temImoveis && comp && comp.dadosConcluidos && comp.dadosConcluidos.total > 0) {
+      return `⚠️ ${nomeQ} — (Boletim: 0 imóveis ≠ Concluídos: ${comp.dadosConcluidos.total})`;
+    }
+
+    const textoResumoB = formatarTextoResumoQuarteirao(r);
+
+    if (comp && comp.temConcluidos) {
+      if (comp.temDivergencia) {
+        const divsResumo = comp.divergencias
+          .filter(d => d.campo !== "total")
+          .map(d => `${d.sigla}: ${d.valB}≠${d.valC}`)
+          .join(", ");
+        const divFinal = divsResumo || (comp.divergencias[0] ? `Total: ${comp.divergencias[0].valB}≠${comp.divergencias[0].valC}` : "");
+        return `⚠️ ${nomeQ} – ${textoResumoB} ⚠️ DIVERGÊNCIA [${divFinal}]`;
+      } else {
+        return `🟢 ${nomeQ} – ${textoResumoB} (Concluídos ✓)`;
+      }
+    }
+
+    return `🟢 ${nomeQ} – ${textoResumoB} (Sem registro em Concluídos)`;
   }
 
   function atualizarOptionQuarteirao(qKey) {
@@ -4261,15 +4719,27 @@
     const opt = Array.from(sel.options).find(o => o.value === qKey);
     if (!opt) return;
     const r = calcularResumoQuarteiraoBoletins(qKey);
+    const comp = compararBoletimComConcluidos(qKey);
     const nomeQ = qKey === "_legacy" ? "Sem quarteirão (legado)" : `Quarteirão ${formatarIdentificador2Digitos(qKey)}`;
-    if (r.temImoveis) {
-      opt.textContent = `🟢 ${nomeQ} — ${formatarTextoResumoQuarteirao(r)}`;
+
+    opt.textContent = formatarTextoOptionComComparativo(qKey, r, comp);
+
+    if (comp && comp.temDivergencia) {
+      opt.className = "opt-divergente";
+      opt.style.color = "#b91c1c";
+      opt.style.fontWeight = "bold";
+      opt.style.backgroundColor = "#fef2f2";
+    } else if (comp && comp.conferido && comp.temConcluidos) {
+      opt.className = "opt-conferido";
+      opt.style.color = "#15803d";
+      opt.style.fontWeight = "bold";
+      opt.style.backgroundColor = "#f0fdf4";
+    } else if (r.temImoveis) {
       opt.className = "opt-com-imoveis";
       opt.style.color = "#15803d";
       opt.style.fontWeight = "bold";
       opt.style.backgroundColor = "#f0fdf4";
     } else {
-      opt.textContent = `⚪ ${nomeQ} — (Sem imóveis atribuídos)`;
       opt.className = "opt-sem-imoveis";
       opt.style.color = "#64748b";
       opt.style.fontStyle = "italic";
@@ -4284,18 +4754,100 @@
 
     if (!qKey) {
       badge.className = "badge-resumo-quarteirao neutro";
-      badge.innerHTML = `<span>Selecione um quarteirão na lista</span>`;
+      badge.innerHTML = `<span>🔍 Selecione um quarteirão na lista acima para visualizar os imóveis e o comparativo com a aba Concluídos.</span>`;
       if (sel) {
-        sel.classList.remove("com-imoveis", "sem-imoveis");
+        sel.classList.remove("com-imoveis", "sem-imoveis", "divergente");
       }
       return;
     }
 
     const r = calcularResumoQuarteiraoBoletins(qKey);
-    const nomeQ = qKey === "_legacy" ? "Legado" : `Quarteirão ${formatarIdentificador2Digitos(qKey)}`;
+    const comp = compararBoletimComConcluidos(qKey);
+    const nomeQ = qKey === "_legacy" ? "Sem quarteirão (legado)" : `Quarteirão ${formatarIdentificador2Digitos(qKey)}`;
 
-    if (r.temImoveis) {
-      badge.className = "badge-resumo-quarteirao com-imoveis";
+    if (sel) {
+      sel.classList.remove("com-imoveis", "sem-imoveis", "divergente");
+      if (comp && comp.temDivergencia) {
+        sel.classList.add("divergente");
+      } else if (comp && comp.conferido && comp.temConcluidos) {
+        sel.classList.add("com-imoveis");
+      } else if (r.temImoveis) {
+        sel.classList.add("com-imoveis");
+      } else {
+        sel.classList.add("sem-imoveis");
+      }
+    }
+
+    if (comp && comp.temConcluidos) {
+      const temDiv = comp.temDivergencia;
+      badge.className = `badge-resumo-quarteirao ${temDiv ? "divergente" : "conferido"}`;
+
+      const linhasHtml = comp.comparativoCampos.map(item => {
+        const trClass = item.divergente ? "linha-divergente" : "linha-conferida";
+        const totalClass = item.campo === "total" ? "linha-total-comparativo" : "";
+        const badgeSituacao = item.divergente
+          ? `<span class="badge-divergencia-alerta">⚠️ Diferença de ${Math.abs(item.diff)} (${item.diff > 0 ? `+${item.diff} no Boletim` : `${item.diff} no Boletim`})</span>`
+          : `<span class="badge-igual-sucesso">✓ Sem divergência</span>`;
+
+        return `
+          <tr class="${trClass} ${totalClass}">
+            <td class="col-tipo">${item.campo === "total" ? `<b>${item.label}</b>` : item.label}</td>
+            <td><span class="val-num val-boletim">${item.valB}</span></td>
+            <td><span class="val-num val-concluidos">${item.valC}</span></td>
+            <td><span class="tag-comp">${item.valB} × ${item.valC}</span></td>
+            <td>${badgeSituacao}</td>
+          </tr>
+        `;
+      }).join("");
+
+      const headerTitulo = temDiv
+        ? `⚠️ Divergência detectada entre o Boletim e a aba Concluídos`
+        : `✅ 100% Conferido com a aba Concluídos`;
+
+      const headerPill = temDiv
+        ? `<span class="comparativo-header-pill alerta">🚨 ${comp.divergencias.length} tipo(s) com divergência</span>`
+        : `<span class="comparativo-header-pill sucesso">✓ Todos os valores coincidem</span>`;
+
+      const footerTexto = temDiv
+        ? `⚠️ <b>Atenção:</b> Os tipos de imóveis destacados em vermelho apresentam divergência entre o Boletim e a aba Concluídos. Verifique as anotações para ajustar a contagem.`
+        : `✅ <b>Perfeito:</b> A contagem de cada tipo de imóvel (R, C, TB, PE, O e Total) está em total conformidade entre o Boletim e os Concluídos.`;
+
+      badge.innerHTML = `
+        <div class="card-comparativo-quarteirao ${temDiv ? "divergente" : "conferido"}">
+          <div class="comparativo-header ${temDiv ? "divergente" : "conferido"}">
+            <div class="comparativo-header-titulo">
+              <span>${temDiv ? "⚠️" : "✅"}</span>
+              <div>
+                <div><b>${nomeQ}</b> – ${headerTitulo}</div>
+                <div class="comparativo-header-sub">Boletim: <b>${r.total}</b> imóvel(is) | Concluídos: <b>${comp.dadosConcluidos.total}</b> imóvel(is)${comp.dadosConcluidos.estaConcluido ? " · Status: Concluído ✓" : ""}</div>
+              </div>
+            </div>
+            ${headerPill}
+          </div>
+          <div class="comparativo-tabela-scroll">
+            <table class="tabela-comparativo-concluidos">
+              <thead>
+                <tr>
+                  <th class="col-th-tipo">Tipo de Imóvel</th>
+                  <th>📄 Boletim</th>
+                  <th>✅ Concluídos</th>
+                  <th>Comparativo</th>
+                  <th>Situação</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${linhasHtml}
+              </tbody>
+            </table>
+          </div>
+          <div class="comparativo-footer">
+            <span>${footerTexto}</span>
+            <span><b>Comparação automática ativa</b></span>
+          </div>
+        </div>
+      `;
+    } else if (r.temImoveis) {
+      badge.className = "badge-resumo-quarteirao apenas-boletim";
       const tipos = [];
       if (r.R > 0) tipos.push(`R: <b>${r.R}</b>`);
       if (r.C > 0) tipos.push(`C: <b>${r.C}</b>`);
@@ -4305,25 +4857,37 @@
       const detalheTipos = tipos.length > 0 ? ` (${tipos.join(" · ")})` : "";
 
       badge.innerHTML = `
-        <span class="icone-status">🟢</span>
-        <span class="quarteirao-nome" style="color: #15803d; font-weight: bold;">${nomeQ}:</span>
-        <span class="resumo-dados"><b>${r.total} imóvel(is) atribuído(s)</b>${detalheTipos}</span>
+        <div class="card-comparativo-quarteirao apenas-boletim">
+          <div class="comparativo-header apenas-boletim">
+            <div class="comparativo-header-titulo">
+              <span>🟢</span>
+              <div>
+                <div><b>${nomeQ}:</b> <b>${r.total} imóvel(is) atribuído(s) no Boletim</b>${detalheTipos}</div>
+                <div class="comparativo-header-sub">Este quarteirão possui imóveis no Boletim, mas ainda não foi lançado no Diário / Concluídos.</div>
+              </div>
+            </div>
+            <span class="comparativo-header-pill info">ℹ️ Sem registro em Concluídos</span>
+          </div>
+          <div class="comparativo-footer">
+            <span>Para realizar o comparativo automático individual (R, C, TB, PE e O), lance este quarteirão no Diário.</span>
+          </div>
+        </div>
       `;
-      if (sel) {
-        sel.classList.add("com-imoveis");
-        sel.classList.remove("sem-imoveis");
-      }
     } else {
       badge.className = "badge-resumo-quarteirao sem-imoveis";
       badge.innerHTML = `
-        <span class="icone-status">⚪</span>
-        <span class="quarteirao-nome" style="color: #854d0e; font-weight: bold;">${nomeQ}:</span>
-        <span class="resumo-dados">Nenhum imóvel atribuído ainda</span>
+        <div class="card-comparativo-quarteirao sem-imoveis">
+          <div class="comparativo-header sem-imoveis">
+            <div class="comparativo-header-titulo">
+              <span>⚪</span>
+              <div>
+                <div><b>${nomeQ}:</b> Nenhum imóvel atribuído ainda no Boletim</div>
+                <div class="comparativo-header-sub">Preencha os imóveis ou o resumo do quarteirão na tabela abaixo.</div>
+              </div>
+            </div>
+          </div>
+        </div>
       `;
-      if (sel) {
-        sel.classList.add("sem-imoveis");
-        sel.classList.remove("com-imoveis");
-      }
     }
   }
 
@@ -4342,56 +4906,114 @@
 
     let comImoveisCount = 0;
     let semImoveisCount = 0;
+    let divergentesCount = 0;
+    let conferidosCount = 0;
 
     const resumos = {};
+    const comparativos = {};
+
     todasChaves.forEach(q => {
       const r = calcularResumoQuarteiraoBoletins(q);
+      const comp = compararBoletimComConcluidos(q);
       resumos[q] = r;
+      comparativos[q] = comp;
+
       if (r.temImoveis) comImoveisCount++;
       else semImoveisCount++;
+
+      if (comp && comp.temDivergencia) {
+        divergentesCount++;
+      } else if (comp && comp.conferido && comp.temConcluidos) {
+        conferidosCount++;
+      }
     });
 
     const contadorFiltroEl = document.getElementById("contadorStatusQuarteiroes");
     if (contadorFiltroEl) {
-      contadorFiltroEl.innerHTML = `📊 <b>${comImoveisCount}</b> com imóveis · <b>${semImoveisCount}</b> sem imóveis (total: <b>${todasChaves.length}</b>)`;
+      const badgeDiv = divergentesCount > 0
+        ? `<span style="background: #dc2626; color: #fff; padding: 2px 7px; border-radius: 10px; font-weight: bold; margin: 0 3px;">⚠️ ${divergentesCount} divergência(s)</span>`
+        : `<span style="color: #e0f2fe;">0 divergências</span>`;
+      const badgeConf = `<span style="color: #bbf7d0; font-weight: bold;">✅ ${conferidosCount} conferidos</span>`;
+      contadorFiltroEl.innerHTML = `📊 <b>${comImoveisCount}</b> com imóveis · ${badgeDiv} · ${badgeConf} · <b>${semImoveisCount}</b> sem imóveis (total: <b>${todasChaves.length}</b>)`;
     }
 
     document.querySelectorAll(".btn-filtro-q").forEach(btn => {
-      if (btn.dataset.filtro === filtroQuarteiroesBoletinsAtivo) {
+      const f = btn.dataset.filtro;
+      if (f === filtroQuarteiroesBoletinsAtivo) {
         btn.classList.add("ativo");
       } else {
         btn.classList.remove("ativo");
       }
+
+      if (f === "divergentes") {
+        btn.innerHTML = `⚠️ Com divergência (${divergentesCount})`;
+        if (divergentesCount > 0) {
+          btn.style.boxShadow = "0 0 0 2px #ef4444";
+        } else {
+          btn.style.boxShadow = "none";
+        }
+      } else if (f === "conferidos") {
+        btn.innerHTML = `✅ Conferidos (${conferidosCount})`;
+      } else if (f === "com") {
+        btn.innerHTML = `🟢 Com imóveis (${comImoveisCount})`;
+      } else if (f === "sem") {
+        btn.innerHTML = `⚪ Sem imóveis (${semImoveisCount})`;
+      } else if (f === "todos") {
+        btn.innerHTML = `Todos (${todasChaves.length})`;
+      }
     });
 
     const chavesFiltradas = todasChaves.filter(q => {
+      if (filtroQuarteiroesBoletinsAtivo === "divergentes") {
+        return comparativos[q] && comparativos[q].temDivergencia;
+      }
+      if (filtroQuarteiroesBoletinsAtivo === "conferidos") {
+        return comparativos[q] && comparativos[q].conferido && comparativos[q].temConcluidos;
+      }
       if (filtroQuarteiroesBoletinsAtivo === "com") return resumos[q].temImoveis;
       if (filtroQuarteiroesBoletinsAtivo === "sem") return !resumos[q].temImoveis;
       return true;
     });
 
     sel.innerHTML = `<option value="">-- Selecione um quarteirão --</option>`;
-    chavesFiltradas.forEach(q => {
-      const opt = document.createElement("option");
-      opt.value = q;
-      const nomeQ = q === "_legacy" ? "Sem quarteirão (legado)" : `Quarteirão ${formatarIdentificador2Digitos(q)}`;
-      const r = resumos[q];
+    if (chavesFiltradas.length === 0 && filtroQuarteiroesBoletinsAtivo === "divergentes") {
+      const optVazio = document.createElement("option");
+      optVazio.value = "";
+      optVazio.textContent = "🎉 Nenhuma divergência encontrada! Todos os quarteirões estão conferidos.";
+      sel.appendChild(optVazio);
+    } else {
+      chavesFiltradas.forEach(q => {
+        const opt = document.createElement("option");
+        opt.value = q;
+        const r = resumos[q];
+        const comp = comparativos[q];
 
-      if (r.temImoveis) {
-        opt.textContent = `🟢 ${nomeQ} — ${formatarTextoResumoQuarteirao(r)}`;
-        opt.className = "opt-com-imoveis";
-        opt.style.color = "#15803d";
-        opt.style.fontWeight = "bold";
-        opt.style.backgroundColor = "#f0fdf4";
-      } else {
-        opt.textContent = `⚪ ${nomeQ} — (Sem imóveis atribuídos)`;
-        opt.className = "opt-sem-imoveis";
-        opt.style.color = "#64748b";
-        opt.style.fontStyle = "italic";
-        opt.style.backgroundColor = "#ffffff";
-      }
-      sel.appendChild(opt);
-    });
+        opt.textContent = formatarTextoOptionComComparativo(q, r, comp);
+
+        if (comp && comp.temDivergencia) {
+          opt.className = "opt-divergente";
+          opt.style.color = "#b91c1c";
+          opt.style.fontWeight = "bold";
+          opt.style.backgroundColor = "#fef2f2";
+        } else if (comp && comp.conferido && comp.temConcluidos) {
+          opt.className = "opt-conferido";
+          opt.style.color = "#15803d";
+          opt.style.fontWeight = "bold";
+          opt.style.backgroundColor = "#f0fdf4";
+        } else if (r.temImoveis) {
+          opt.className = "opt-com-imoveis";
+          opt.style.color = "#15803d";
+          opt.style.fontWeight = "bold";
+          opt.style.backgroundColor = "#f0fdf4";
+        } else {
+          opt.className = "opt-sem-imoveis";
+          opt.style.color = "#64748b";
+          opt.style.fontStyle = "italic";
+          opt.style.backgroundColor = "#ffffff";
+        }
+        sel.appendChild(opt);
+      });
+    }
 
     if (quarteiraoBoletinsSelecionado && chavesFiltradas.indexOf(quarteiraoBoletinsSelecionado) !== -1) {
       sel.value = quarteiraoBoletinsSelecionado;
@@ -5589,12 +6211,14 @@
       if (confirm(`Marcar "${quart}" como CONCLUÍDO?`)) {
         statusQuarteiroes[quart] = "concluido";
         salvarStatus(); salvar(); atualizarAndamento(); atualizarConcluidos();
+        if (typeof popularSelectQuarteiroes === "function") popularSelectQuarteiroes();
       }
     } else {
       if (statusQuarteiroes[quart] === "concluido") {
         if (confirm(`Voltar "${quart}" para EM ANDAMENTO?`)) {
           delete statusQuarteiroes[quart];
           salvarStatus(); salvar(); atualizarAndamento(); atualizarConcluidos();
+          if (typeof popularSelectQuarteiroes === "function") popularSelectQuarteiroes();
         }
       } else { mostrarAviso(`"${quart}" permanece em andamento`); }
     }
@@ -5699,6 +6323,9 @@
       if (!document.getElementById("painel-bases").classList.contains("oculto")) renderizarBasesIntegrado();
       if (!document.getElementById("painel-basesliraa").classList.contains("oculto")) renderizarBasesLiraaIntegrado();
       if (!document.getElementById("painel-resumogeral").classList.contains("oculto")) renderizarResumoGeral();
+      if (!document.getElementById("painel-boletins").classList.contains("oculto") || document.getElementById("selectQuarteiraoBoletins")) {
+        if (typeof popularSelectQuarteiroes === "function") popularSelectQuarteiroes();
+      }
     }, 400);
   }
 
