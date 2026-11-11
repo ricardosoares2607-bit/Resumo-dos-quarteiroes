@@ -4792,16 +4792,16 @@
         return `
           <tr class="${trClass} ${totalClass}">
             <td class="col-tipo">${item.campo === "total" ? `<b>${item.label}</b>` : item.label}</td>
-            <td><span class="val-num val-boletim">${item.valB}</span></td>
             <td><span class="val-num val-concluidos">${item.valC}</span></td>
-            <td><span class="tag-comp">${item.valB} × ${item.valC}</span></td>
+            <td><span class="val-num val-boletim">${item.valB}</span></td>
+            <td><span class="tag-comp">${item.valC} × ${item.valB}</span></td>
             <td>${badgeSituacao}</td>
           </tr>
         `;
       }).join("");
 
       const headerTitulo = temDiv
-        ? `⚠️ Divergência detectada entre o Boletim e a aba Concluídos`
+        ? `⚠️ Divergência detectada entre a aba Concluídos e o Boletim`
         : `✅ 100% Conferido com a aba Concluídos`;
 
       const headerPill = temDiv
@@ -4809,8 +4809,8 @@
         : `<span class="comparativo-header-pill sucesso">✓ Todos os valores coincidem</span>`;
 
       const footerTexto = temDiv
-        ? `⚠️ <b>Atenção:</b> Os tipos de imóveis destacados em vermelho apresentam divergência entre o Boletim e a aba Concluídos. Verifique as anotações para ajustar a contagem.`
-        : `✅ <b>Perfeito:</b> A contagem de cada tipo de imóvel (R, C, TB, PE, O e Total) está em total conformidade entre o Boletim e os Concluídos.`;
+        ? `⚠️ <b>Atenção:</b> Os tipos de imóveis destacados em vermelho apresentam divergência entre a aba Concluídos e o Boletim. Verifique as anotações para ajustar a contagem.`
+        : `✅ <b>Perfeito:</b> A contagem de cada tipo de imóvel (R, C, TB, PE, O e Total) está em total conformidade entre a aba Concluídos e o Boletim.`;
 
       badge.innerHTML = `
         <div class="card-comparativo-quarteirao ${temDiv ? "divergente" : "conferido"}">
@@ -4819,7 +4819,7 @@
               <span>${temDiv ? "⚠️" : "✅"}</span>
               <div>
                 <div><b>${nomeQ}</b> – ${headerTitulo}</div>
-                <div class="comparativo-header-sub">Boletim: <b>${r.total}</b> imóvel(is) | Concluídos: <b>${comp.dadosConcluidos.total}</b> imóvel(is)${comp.dadosConcluidos.estaConcluido ? " · Status: Concluído ✓" : ""}</div>
+                <div class="comparativo-header-sub">Concluídos: <b>${comp.dadosConcluidos.total}</b> imóvel(is) | Boletim: <b>${r.total}</b> imóvel(is)${comp.dadosConcluidos.estaConcluido ? " · Status: Concluído ✓" : ""}</div>
               </div>
             </div>
             ${headerPill}
@@ -4829,8 +4829,8 @@
               <thead>
                 <tr>
                   <th class="col-th-tipo">Tipo de Imóvel</th>
-                  <th>📄 Boletim</th>
                   <th>✅ Concluídos</th>
+                  <th>📄 Boletim</th>
                   <th>Comparativo</th>
                   <th>Situação</th>
                 </tr>
