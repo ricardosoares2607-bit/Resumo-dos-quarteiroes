@@ -1517,20 +1517,26 @@
     .tabela-dupla.com-liraa .col-liraa { width: 13% !important; font-weight: bold !important; background: #f1f8e9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .tabela-dupla.com-liraa thead th.col-liraa,
     .tabela-dupla.com-liraa tr.linha-total td.col-liraa { background: #1b5e20 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .barra-flutuante-selecao, .btn-toggle-selecao { display: none !important; }
+    .barra-flutuante-selecao, .btn-toggle-selecao, .menu-contexto-planilha { display: none !important; }
     td.celula-selecionada { background-color: transparent !important; outline: none !important; }
   }
 
-  /* ===== SELEÇÃO MÚLTIPLA DE CÉLULAS (DIÁRIO, BOLETINS E CONFLAGRADOS) ===== */
+  /* ===== SELEÇÃO MÚLTIPLA E AÇÕES ESTILO PLANILHA (DIÁRIO, BOLETINS E CONFLAGRADOS) ===== */
+  #painel-diario table tbody td,
+  #painel-boletins table tbody td,
+  #painel-coflagrados table tbody td {
+    cursor: cell;
+  }
   td.celula-selecionada {
-    background-color: #bfdbfe !important;
+    background-color: #dbeafe !important;
     outline: 2px solid #2563eb !important;
     outline-offset: -2px;
     position: relative;
-    z-index: 2;
-    transition: background-color 0.1s ease;
-    -webkit-user-select: none;
+    z-index: 5;
+    transition: background-color 0.08s ease;
+    box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.25);
     user-select: none;
+    -webkit-user-select: none;
   }
   td.celula-selecionada input {
     background-color: transparent !important;
@@ -1553,24 +1559,25 @@
   }
   .barra-flutuante-selecao {
     position: fixed;
-    bottom: 25px;
+    bottom: 22px;
     left: 50%;
     transform: translateX(-50%);
     background: #0f172a;
     color: #ffffff;
-    padding: 8px 18px;
+    padding: 7px 14px;
     border-radius: 35px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), 0 4px 10px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.3);
     display: none;
     align-items: center;
-    gap: 10px;
+    gap: 7px;
     z-index: 10000;
     font-family: inherit;
     font-size: 13px;
-    animation: surgimentoBarra 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    max-width: 95vw;
+    animation: surgimentoBarra 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    max-width: 96vw;
     flex-wrap: wrap;
     justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.15);
   }
   @keyframes surgimentoBarra {
     from { opacity: 0; transform: translate(-50%, 15px); }
@@ -1579,30 +1586,39 @@
   .barra-flutuante-selecao .badge-contador {
     background: #2563eb;
     color: #fff;
-    padding: 3px 10px;
-    border-radius: 12px;
+    padding: 4px 10px;
+    border-radius: 14px;
     font-weight: bold;
     font-size: 12px;
     white-space: nowrap;
+    margin-right: 2px;
   }
   .barra-flutuante-selecao button {
     background: #334155;
     color: #ffffff;
     border: none;
-    padding: 6px 14px;
-    border-radius: 20px;
+    padding: 6px 12px;
+    border-radius: 18px;
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 600;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    transition: all 0.15s ease;
+    transition: all 0.12s ease;
     white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
   }
   .barra-flutuante-selecao button:hover {
     background: #475569;
     transform: translateY(-1px);
+  }
+  .barra-flutuante-selecao button.btn-cortar {
+    background: #b45309;
+  }
+  .barra-flutuante-selecao button.btn-cortar:hover {
+    background: #d97706;
   }
   .barra-flutuante-selecao button.btn-perigo {
     background: #991b1b;
@@ -1622,6 +1638,95 @@
   .barra-flutuante-selecao button.btn-primario:hover {
     background: #3b82f6;
   }
+  .barra-flutuante-selecao button.btn-fechar {
+    background: #1e293b;
+    color: #94a3b8;
+    padding: 6px 10px;
+  }
+  .barra-flutuante-selecao button.btn-fechar:hover {
+    background: #334155;
+    color: #ffffff;
+  }
+
+  /* Menu de Contexto (Botão Direito / Toque Longo) estilo Excel */
+  .menu-contexto-planilha {
+    position: fixed;
+    background: #ffffff;
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.15);
+    z-index: 10005;
+    min-width: 220px;
+    padding: 6px 0;
+    font-family: inherit;
+    font-size: 13px;
+    animation: menuContextoFade 0.12s ease-out;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  @keyframes menuContextoFade {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .menu-contexto-planilha .menu-item-titulo {
+    padding: 6px 14px 4px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .menu-contexto-planilha .menu-divisor {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 4px 0;
+  }
+  .menu-contexto-planilha .menu-item {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 7px 14px;
+    text-align: left;
+    font-size: 13px;
+    color: #334155;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.12s ease, color 0.12s ease;
+    box-sizing: border-box;
+  }
+  .menu-contexto-planilha .menu-item:hover {
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+  .menu-contexto-planilha .menu-item.menu-item-perigo:hover {
+    background: #fef2f2;
+    color: #dc2626;
+  }
+  .menu-contexto-planilha .menu-icone {
+    font-size: 15px;
+    width: 20px;
+    text-align: center;
+    display: inline-block;
+  }
+  .menu-contexto-planilha .menu-label {
+    flex: 1;
+    font-weight: 500;
+  }
+  .menu-contexto-planilha .menu-atalho {
+    font-size: 11px;
+    color: #94a3b8;
+    background: #f1f5f9;
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    font-family: monospace;
+  }
 </style>
 </head>
 <body>
@@ -1632,7 +1737,7 @@
 </h1>
 
 <div class="status-nuvem-container" style="display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap;">
-  <span id="statusNuvem" class="badge-nuvem pendente">☁️ Conectando à nuvem...</span>
+  <span id="statusNuvem" class="badge-nuvem pendente" onclick="forcarReconexaoNuvem()" style="cursor: pointer;" title="Clique para verificar ou reconectar com a nuvem">☁️ Conectando à nuvem...</span>
   <button id="btnInstalarPWA" class="badge-nuvem" style="display: none; background: #0e6833; color: #fff; border: 1px solid #094722; cursor: pointer; align-items: center; gap: 5px;" title="Instalar aplicativo na tela inicial">
     📲 Instalar Aplicativo
   </button>
@@ -2021,10 +2126,15 @@
 
   let dbRef = null;
   let nuvemAtiva = false;
+  let appNuvemPrincipal = null;
+  let appNuvemAtiva = null;
+  let usandoNuvemReserva = false;
+  let erroPermissaoNuvem = false;
 
   try {
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    appNuvemPrincipal = (firebase.apps && firebase.apps.find(a => a.name === "[DEFAULT]")) || firebase.initializeApp(firebaseConfig);
+    appNuvemAtiva = appNuvemPrincipal;
+    const db = appNuvemPrincipal.database();
     dbRef = db.ref("diario_producao_pmcd");
     nuvemAtiva = true;
   } catch (err) { console.error("Falha ao inicializar Firebase:", err); }
@@ -2333,12 +2443,25 @@
     });
   }
 
+  let firebaseSocketConectado = false;
+  let emHandshakeNuvem = navigator.onLine;
+  let timerHandshakeNuvem = null;
+  let connectedRefAtual = null;
+  let connectedCallbackAtual = null;
+  let dbRefOuvinteAtual = null;
+  let dbValueCallbackAtual = null;
+
   function atualizarBadgeNuvem(online, textoCustom) {
     const badge = document.getElementById("statusNuvem");
     if (!badge) return;
     if (textoCustom) {
       badge.className = "badge-nuvem pendente";
       badge.textContent = textoCustom;
+      return;
+    }
+    if (erroPermissaoNuvem) {
+      badge.className = "badge-nuvem offline";
+      badge.textContent = "🔒 Nuvem bloqueada (Permissão Firebase)";
       return;
     }
     const pendente = (function() {
@@ -2353,6 +2476,9 @@
         badge.className = "badge-nuvem online";
         badge.textContent = "☁️ Nuvem Conectada (Tempo Real)";
       }
+    } else if (navigator.onLine && emHandshakeNuvem && nuvemAtiva) {
+      badge.className = "badge-nuvem pendente";
+      badge.textContent = "☁️ Conectando à nuvem...";
     } else {
       if (pendente) {
         badge.className = "badge-nuvem pendente";
@@ -2372,7 +2498,7 @@
         localStorage.removeItem(STORAGE_PENDENTE_NUVEM);
       }
     } catch (e) {}
-    atualizarBadgeNuvem(navigator.onLine);
+    atualizarBadgeNuvem(firebaseSocketConectado && navigator.onLine && !erroPermissaoNuvem);
   }
 
   let sincronizandoNuvem = false;
@@ -2392,7 +2518,12 @@
     }
   }
 
-  function enviarDadosLocaisParaNuvem() {
+  function isErroPermissaoFirebase(err) {
+    const msg = String((err && (err.code || err.message)) || err || "").toLowerCase();
+    return msg.includes("permission") || msg.includes("unauthorized") || msg.includes("401");
+  }
+
+  function enviarDadosLocaisParaNuvem(forcarToast = false) {
     if (!nuvemAtiva || !dbRef || !navigator.onLine) return;
     if (sincronizandoNuvem) return;
 
@@ -2421,12 +2552,25 @@
 
       dbRef.set(payload).then(() => {
         sincronizandoNuvem = false;
+        erroPermissaoNuvem = false;
+        firebaseSocketConectado = true;
+        emHandshakeNuvem = false;
         marcarAlteracaoPendente(false);
         atualizarBadgeNuvem(true);
+        if (forcarToast) {
+          mostrarAviso("☁️ Salvo e sincronizado na nuvem!");
+        }
       }).catch(err => {
         sincronizandoNuvem = false;
         marcarAlteracaoPendente(true);
         console.warn("Falha no envio de dados locais para a nuvem:", err);
+        if (isErroPermissaoFirebase(err)) {
+          if (!usandoNuvemReserva && ativarNuvemReserva("permission_denied_write")) {
+            return;
+          }
+          erroPermissaoNuvem = true;
+          atualizarBadgeNuvem(false);
+        }
       });
     } catch (e) {
       sincronizandoNuvem = false;
@@ -2446,36 +2590,89 @@
     salvarResumoReconhecimentoPMCD();
   }
 
-  function monitorarConexaoNuvem() {
-    atualizarBadgeNuvem(navigator.onLine);
+  function limparOuvintesNuvem() {
+    try {
+      if (connectedRefAtual && connectedCallbackAtual) {
+        connectedRefAtual.off("value", connectedCallbackAtual);
+      }
+    } catch (e) {}
+    try {
+      if (dbRefOuvinteAtual && dbValueCallbackAtual) {
+        dbRefOuvinteAtual.off("value", dbValueCallbackAtual);
+      }
+    } catch (e) {}
+    connectedRefAtual = null;
+    connectedCallbackAtual = null;
+    dbRefOuvinteAtual = null;
+    dbValueCallbackAtual = null;
+  }
 
-    window.addEventListener("online", () => {
-      atualizarBadgeNuvem(true);
-      mostrarAviso("🌐 Conexão restabelecida! Sincronizando dados...");
-      sincronizarTudoComNuvem();
-    });
-
-    window.addEventListener("offline", () => {
+  function ativarNuvemReserva(motivo) {
+    if (usandoNuvemReserva || !pmcdApp) return false;
+    try {
+      console.warn("Alternando sincronização para nuvem ativa PMCD devido a:", motivo);
+      limparOuvintesNuvem();
+      usandoNuvemReserva = true;
+      erroPermissaoNuvem = false;
+      appNuvemAtiva = pmcdApp;
+      dbRef = pmcdApp.database().ref("andamento_quarteiroes/diario_producao_pmcd");
+      nuvemAtiva = true;
+      emHandshakeNuvem = navigator.onLine;
       atualizarBadgeNuvem(false);
-      mostrarAviso("⚡ Operando offline. Todos os seus lançamentos ficam 100% salvos no aparelho!");
-    });
+      iniciarListenersNuvemAtiva();
+      return true;
+    } catch (e) {
+      console.error("Erro ao ativar nuvem reserva:", e);
+      return false;
+    }
+  }
 
-    if (!nuvemAtiva || !dbRef) {
+  function iniciarListenersNuvemAtiva() {
+    if (!nuvemAtiva || !dbRef || !appNuvemAtiva) {
       atualizarBadgeNuvem(false, "⚠️ Nuvem em modo local");
       return;
     }
 
+    limparOuvintesNuvem();
+    clearTimeout(timerHandshakeNuvem);
+    emHandshakeNuvem = navigator.onLine;
+    timerHandshakeNuvem = setTimeout(() => {
+      emHandshakeNuvem = false;
+      if (!firebaseSocketConectado) {
+        if (!usandoNuvemReserva && pmcdApp && navigator.onLine) {
+          ativarNuvemReserva("handshake_timeout");
+        } else {
+          atualizarBadgeNuvem(false);
+        }
+      }
+    }, 6000);
+
     try {
-      firebase.database().ref(".info/connected").on("value", (snap) => {
+      const dbInstancia = appNuvemAtiva.database();
+      try { dbInstancia.goOnline(); } catch (e) {}
+      connectedRefAtual = dbInstancia.ref(".info/connected");
+      connectedCallbackAtual = (snap) => {
         const conectado = snap.val() === true;
-        atualizarBadgeNuvem(conectado);
+        firebaseSocketConectado = conectado;
         if (conectado) {
+          emHandshakeNuvem = false;
+          clearTimeout(timerHandshakeNuvem);
+        }
+        atualizarBadgeNuvem(conectado && !erroPermissaoNuvem);
+        if (conectado && !erroPermissaoNuvem) {
           sincronizarTudoComNuvem();
         }
-      });
+      };
+      connectedRefAtual.on("value", connectedCallbackAtual);
     } catch (e) {}
 
-    dbRef.on("value", (snapshot) => {
+    dbRefOuvinteAtual = dbRef;
+    dbValueCallbackAtual = (snapshot) => {
+      erroPermissaoNuvem = false;
+      firebaseSocketConectado = true;
+      emHandshakeNuvem = false;
+      clearTimeout(timerHandshakeNuvem);
+
       // Se estivermos ativamente no meio de um envio, este disparo é reflexo local da nossa própria gravação
       if (sincronizandoNuvem) return;
 
@@ -2484,6 +2681,8 @@
         const semanasLocais = coletarDados();
         if (semanasLocais && semanasLocais.length > 0) {
           enviarDadosLocaisParaNuvem();
+        } else {
+          atualizarBadgeNuvem(true);
         }
         return;
       }
@@ -2506,13 +2705,75 @@
         return;
       }
 
-      if (tsRemoto <= tsLocal) return;
+      if (tsRemoto <= tsLocal) {
+        atualizarBadgeNuvem(true);
+        return;
+      }
 
       aplicarDadosRemotos(dadosNuvem);
-    }, (err) => {
+      atualizarBadgeNuvem(true);
+    };
+
+    dbRef.on("value", dbValueCallbackAtual, (err) => {
       console.warn("Aviso de conexão Firebase:", err);
+      emHandshakeNuvem = false;
+      clearTimeout(timerHandshakeNuvem);
+      if (isErroPermissaoFirebase(err)) {
+        if (!usandoNuvemReserva && ativarNuvemReserva("permission_denied_read")) {
+          return;
+        }
+        erroPermissaoNuvem = true;
+      }
       atualizarBadgeNuvem(false);
     });
+  }
+
+  function forcarReconexaoNuvem() {
+    if (!navigator.onLine) {
+      atualizarBadgeNuvem(false);
+      mostrarAviso("⚡ Seu aparelho está sem conexão com a internet no momento.");
+      return;
+    }
+    if (erroPermissaoNuvem && appNuvemPrincipal) {
+      usandoNuvemReserva = false;
+      appNuvemAtiva = appNuvemPrincipal;
+      dbRef = appNuvemPrincipal.database().ref("diario_producao_pmcd");
+      mostrarAviso("🔒 Banco Firebase sem permissão. Tentando reconectar...");
+    } else {
+      mostrarAviso("🔄 Verificando conexão com a nuvem...");
+    }
+    erroPermissaoNuvem = false;
+    emHandshakeNuvem = true;
+    atualizarBadgeNuvem(false, "🔄 Conectando à nuvem...");
+    try { if (appNuvemAtiva) appNuvemAtiva.database().goOnline(); } catch (e) {}
+    try { if (pmcdApp) pmcdApp.database().goOnline(); } catch (e) {}
+    iniciarListenersNuvemAtiva();
+    sincronizarTudoComNuvem();
+  }
+
+  function monitorarConexaoNuvem() {
+    emHandshakeNuvem = navigator.onLine;
+    atualizarBadgeNuvem(false);
+
+    window.addEventListener("online", () => {
+      emHandshakeNuvem = true;
+      erroPermissaoNuvem = false;
+      atualizarBadgeNuvem(false);
+      mostrarAviso("🌐 Conexão restabelecida! Sincronizando dados...");
+      try { if (appNuvemAtiva) appNuvemAtiva.database().goOnline(); } catch (e) {}
+      try { if (pmcdApp) pmcdApp.database().goOnline(); } catch (e) {}
+      iniciarListenersNuvemAtiva();
+      sincronizarTudoComNuvem();
+    });
+
+    window.addEventListener("offline", () => {
+      firebaseSocketConectado = false;
+      emHandshakeNuvem = false;
+      atualizarBadgeNuvem(false);
+      mostrarAviso("⚡ Operando offline. Todos os seus lançamentos ficam 100% salvos no aparelho!");
+    });
+
+    iniciarListenersNuvemAtiva();
   }
 
   function aplicarDadosRemotos(dados) {
@@ -6295,9 +6556,8 @@
 
       marcarAlteracaoPendente(true);
 
-      if (navigator.onLine && nuvemAtiva && dbRef) {
-        enviarDadosLocaisParaNuvem();
-        mostrarAviso("☁️ Salvo e sincronizado na nuvem!");
+      if (navigator.onLine && nuvemAtiva && dbRef && !erroPermissaoNuvem) {
+        enviarDadosLocaisParaNuvem(true);
       } else {
         atualizarBadgeNuvem(false);
         mostrarAviso("💾 Salvo no aparelho (offline)");
@@ -7034,10 +7294,16 @@
     });
   }
 
-  function limparCelulasSelecionadas() {
+  function limparCelulasSelecionadas(silencioso = false) {
+    if (celulasSelecionadas.size === 0) {
+      if (document.activeElement instanceof HTMLInputElement) {
+        const info = obterInfoCelula(document.activeElement);
+        if (info) alternarSelecaoCelula(info, true);
+      }
+    }
     if (celulasSelecionadas.size === 0) return;
     const count = celulasSelecionadas.size;
-    if (count > 50 && !confirm(`Deseja realmente apagar as ${count} células selecionadas?`)) return;
+    if (!silencioso && count > 50 && !confirm(`Deseja realmente apagar as ${count} células selecionadas?`)) return;
 
     const quarteiroesAfetadosBoletins = new Set();
     let alterouDiario = false;
@@ -7110,13 +7376,21 @@
       salvarComAtraso();
     }
 
-    mostrarAviso(`🗑️ ${count} célula(s) apagada(s)!`);
+    if (!silencioso) {
+      mostrarAviso(count === 1 ? "🗑️ Célula apagada!" : `🗑️ ${count} células apagadas!`);
+    }
   }
 
   function preencherCelulasSelecionadas() {
+    if (celulasSelecionadas.size === 0) {
+      if (document.activeElement instanceof HTMLInputElement) {
+        const info = obterInfoCelula(document.activeElement);
+        if (info) alternarSelecaoCelula(info, true);
+      }
+    }
     if (celulasSelecionadas.size === 0) return;
     const count = celulasSelecionadas.size;
-    const digitado = prompt(`Digite o valor para preencher as ${count} células selecionadas:`);
+    const digitado = prompt(`Digite o valor para preencher as ${count} célula(s) selecionada(s):`);
     if (digitado === null) return;
 
     const valTrim = digitado.trim();
@@ -7215,8 +7489,18 @@
     mostrarAviso(`✏️ ${count} célula(s) preenchida(s) com "${valTrim}"!`);
   }
 
-  async function copiarCelulasSelecionadas() {
-    if (celulasSelecionadas.size === 0) return;
+  async function copiarCelulasSelecionadas(silencioso = false) {
+    if (celulasSelecionadas.size === 0) {
+      if (document.activeElement instanceof HTMLInputElement) {
+        const info = obterInfoCelula(document.activeElement);
+        if (info) alternarSelecaoCelula(info, true);
+      }
+    }
+    if (celulasSelecionadas.size === 0) {
+      if (!silencioso) mostrarAviso("⚠️ Selecione ao menos uma célula para copiar.");
+      return false;
+    }
+
     const mapaLinhas = new Map();
     celulasSelecionadas.forEach(td => {
       const tr = td.parentElement;
@@ -7241,24 +7525,55 @@
     });
 
     const textoFinal = linhasTexto.join("\n");
+    let copiado = false;
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(textoFinal);
+        copiado = true;
       } else {
         throw new Error("Clipboard API indisponível");
       }
-      mostrarAviso(`📋 ${celulasSelecionadas.size} célula(s) copiada(s)!`);
     } catch (err) {
-      const ta = document.createElement("textarea");
-      ta.value = textoFinal;
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
-      mostrarAviso(`📋 ${celulasSelecionadas.size} célula(s) copiada(s)!`);
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = textoFinal;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        copiado = document.execCommand("copy");
+        document.body.removeChild(ta);
+      } catch (e2) {
+        copiado = false;
+      }
     }
+
+    if (!silencioso) {
+      if (copiado) {
+        const n = celulasSelecionadas.size;
+        mostrarAviso(n === 1 ? "📋 Célula copiada!" : `📋 ${n} células copiadas!`);
+      } else {
+        mostrarAviso("⚠️ Não foi possível copiar para a área de transferência.");
+      }
+    }
+    return copiado;
+  }
+
+  async function cortarCelulasSelecionadas() {
+    if (celulasSelecionadas.size === 0) {
+      if (document.activeElement instanceof HTMLInputElement) {
+        const info = obterInfoCelula(document.activeElement);
+        if (info) alternarSelecaoCelula(info, true);
+      }
+    }
+    if (celulasSelecionadas.size === 0) {
+      mostrarAviso("⚠️ Selecione ao menos uma célula para cortar.");
+      return;
+    }
+    const count = celulasSelecionadas.size;
+    await copiarCelulasSelecionadas(true);
+    limparCelulasSelecionadas(true);
+    mostrarAviso(count === 1 ? "✂️ Célula cortada!" : `✂️ ${count} células cortadas!`);
   }
 
   async function colarEmCelulasSelecionadas() {
@@ -7310,28 +7625,95 @@
     }
   }
 
+  function abrirMenuContextoPlanilha(x, y) {
+    let menu = document.getElementById("menuContextoPlanilha");
+    if (!menu) {
+      menu = document.createElement("div");
+      menu.id = "menuContextoPlanilha";
+      menu.className = "menu-contexto-planilha no-print";
+      document.body.appendChild(menu);
+    }
+
+    const qtd = celulasSelecionadas.size;
+    menu.innerHTML = `
+      <div class="menu-item-titulo">
+        <span>${qtd} célula${qtd > 1 ? "s" : ""} selecionada${qtd > 1 ? "s" : ""}</span>
+      </div>
+      <div class="menu-divisor"></div>
+      <button type="button" class="menu-item" onclick="copiarCelulasSelecionadas(); fecharMenuContextoPlanilha();">
+        <span class="menu-icone">📋</span>
+        <span class="menu-label">Copiar</span>
+        <kbd class="menu-atalho">Ctrl+C</kbd>
+      </button>
+      <button type="button" class="menu-item" onclick="cortarCelulasSelecionadas(); fecharMenuContextoPlanilha();">
+        <span class="menu-icone">✂️</span>
+        <span class="menu-label">Cortar</span>
+        <kbd class="menu-atalho">Ctrl+X</kbd>
+      </button>
+      <button type="button" class="menu-item" onclick="colarEmCelulasSelecionadas(); fecharMenuContextoPlanilha();">
+        <span class="menu-icone">📥</span>
+        <span class="menu-label">Colar</span>
+        <kbd class="menu-atalho">Ctrl+V</kbd>
+      </button>
+      <div class="menu-divisor"></div>
+      <button type="button" class="menu-item" onclick="preencherCelulasSelecionadas(); fecharMenuContextoPlanilha();">
+        <span class="menu-icone">✏️</span>
+        <span class="menu-label">Preencher em lote...</span>
+      </button>
+      <button type="button" class="menu-item menu-item-perigo" onclick="limparCelulasSelecionadas(); fecharMenuContextoPlanilha();">
+        <span class="menu-icone">🗑️</span>
+        <span class="menu-label">Apagar conteúdo</span>
+        <kbd class="menu-atalho">Del</kbd>
+      </button>
+      <div class="menu-divisor"></div>
+      <button type="button" class="menu-item" onclick="limparSelecaoCelulas(); fecharMenuContextoPlanilha();">
+        <span class="menu-icone">✕</span>
+        <span class="menu-label">Desmarcar</span>
+        <kbd class="menu-atalho">Esc</kbd>
+      </button>
+    `;
+
+    menu.style.display = "block";
+    const menuWidth = 220;
+    const menuHeight = 250;
+    let left = x;
+    let top = y;
+    if (left + menuWidth > window.innerWidth - 10) {
+      left = Math.max(10, window.innerWidth - menuWidth - 10);
+    }
+    if (top + menuHeight > window.innerHeight - 10) {
+      top = Math.max(10, window.innerHeight - menuHeight - 10);
+    }
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+  }
+
+  function fecharMenuContextoPlanilha() {
+    const menu = document.getElementById("menuContextoPlanilha");
+    if (menu) menu.style.display = "none";
+  }
+
   function atualizarBarraFlutuanteSelecao() {
     let barra = document.getElementById("barraFlutuanteSelecao");
     if (!barra) {
       barra = document.createElement("div");
       barra.id = "barraFlutuanteSelecao";
       barra.className = "barra-flutuante-selecao no-print";
-      barra.innerHTML = `
-        <span class="badge-contador" id="qtdCelulasSelecionadas">0 células</span>
-        <button class="btn-perigo" onclick="limparCelulasSelecionadas()">🗑️ Apagar</button>
-        <button class="btn-sucesso" onclick="preencherCelulasSelecionadas()">✏️ Preencher...</button>
-        <button onclick="copiarCelulasSelecionadas()">📋 Copiar</button>
-        <button class="btn-primario" onclick="colarEmCelulasSelecionadas()">📥 Colar</button>
-        <button onclick="limparSelecaoCelulas()">✕ Desmarcar</button>
-      `;
       document.body.appendChild(barra);
     }
 
     const qtd = celulasSelecionadas.size;
-    const badge = document.getElementById("qtdCelulasSelecionadas");
-    if (badge) badge.textContent = `${qtd} célula${qtd > 1 ? "s" : ""} selecionada${qtd > 1 ? "s" : ""}`;
+    barra.innerHTML = `
+      <span class="badge-contador" id="qtdCelulasSelecionadas">${qtd} célula${qtd > 1 ? "s" : ""}</span>
+      <button type="button" class="btn-copiar" onclick="copiarCelulasSelecionadas()" title="Copiar (Ctrl+C)">📋 Copiar</button>
+      <button type="button" class="btn-cortar" onclick="cortarCelulasSelecionadas()" title="Cortar (Ctrl+X)">✂️ Cortar</button>
+      <button type="button" class="btn-primario btn-colar" onclick="colarEmCelulasSelecionadas()" title="Colar (Ctrl+V)">📥 Colar</button>
+      <button type="button" class="btn-perigo btn-apagar" onclick="limparCelulasSelecionadas()" title="Apagar conteúdo (Del)">🗑️ Apagar</button>
+      <button type="button" class="btn-sucesso btn-preencher" onclick="preencherCelulasSelecionadas()" title="Preencher com valor">✏️ Preencher...</button>
+      <button type="button" class="btn-fechar" onclick="limparSelecaoCelulas()" title="Desmarcar seleção (Esc)">✕</button>
+    `;
 
-    if (qtd > 1 || (qtd === 1 && modoSelecaoAtivo)) {
+    if (qtd >= 1) {
       barra.style.display = "flex";
     } else {
       barra.style.display = "none";
@@ -7342,11 +7724,14 @@
     });
   }
 
-  // Interações de Mouse (Arrasto, Shift+Clique, Ctrl+Clique)
+  // Interações de Mouse estilo Excel (Clique para selecionar, Arraste para selecionar faixa, Shift+Clique, Ctrl+Clique)
   document.addEventListener("mousedown", (e) => {
-    if (e.button !== 0) return;
+    if (e.button !== 0) return; // Apenas botão esquerdo principal
     if (e.target.closest("#barraFlutuanteSelecao")) return;
+    if (e.target.closest("#menuContextoPlanilha")) return;
     if (e.target.closest(".btn-toggle-selecao")) return;
+
+    fecharMenuContextoPlanilha();
 
     const info = obterInfoCelula(e.target);
     if (!info) {
@@ -7371,13 +7756,14 @@
       return;
     }
 
-    if (modoSelecaoAtivo) {
-      e.preventDefault();
-      isDraggingSelecao = true;
-      celulaAncora = info;
-      celulaFocoAtual = info;
-      alternarSelecaoCelula(info, true);
-      return;
+    // Clique simples ou início de seleção por arrasto:
+    // Se a célula clicada já fizer parte de uma seleção múltipla, mantemos temporariamente para permitir ações
+    if (!celulasSelecionadas.has(info.td)) {
+      celulasSelecionadas.forEach(td => td.classList.remove("celula-selecionada"));
+      celulasSelecionadas.clear();
+      info.td.classList.add("celula-selecionada");
+      celulasSelecionadas.add(info.td);
+      atualizarBarraFlutuanteSelecao();
     }
 
     dragInicioCoord = { x: e.clientX, y: e.clientY };
@@ -7390,7 +7776,7 @@
 
     if (!isDraggingSelecao && dragInicioCoord && (e.buttons & 1)) {
       const dist = Math.hypot(e.clientX - dragInicioCoord.x, e.clientY - dragInicioCoord.y);
-      if (dist > 7) {
+      if (dist > 4) {
         isDraggingSelecao = true;
         try { window.getSelection()?.removeAllRanges(); } catch (err) {}
       }
@@ -7399,7 +7785,7 @@
     if (isDraggingSelecao && (e.buttons & 1)) {
       try { window.getSelection()?.removeAllRanges(); } catch (err) {}
       const infoAtual = obterInfoCelula(e.target);
-      if (infoAtual && infoAtual.tbody === celulaAncora.tbody) {
+      if (infoAtual && celulaAncora && infoAtual.tbody === celulaAncora.tbody) {
         selecionarFaixaRetangular(celulaAncora, infoAtual, false);
       }
     }
@@ -7407,19 +7793,51 @@
 
   document.addEventListener("mouseup", (e) => {
     dragInicioCoord = null;
-    if (isDraggingSelecao) {
-      isDraggingSelecao = false;
-      if (celulasSelecionadas.size <= 1 && !modoSelecaoAtivo) {
-        limparSelecaoCelulas();
-      }
+    isDraggingSelecao = false;
+    // Células permanecem selecionadas para ações imediatas (Copiar, Cortar, Colar, Apagar)
+  });
+
+  // Menu de Contexto (Botão Direito) estilo Planilha
+  document.addEventListener("contextmenu", (e) => {
+    if (e.target.closest("#barraFlutuanteSelecao")) return;
+    if (e.target.closest("#menuContextoPlanilha")) return;
+
+    const info = obterInfoCelula(e.target);
+    if (!info) {
+      fecharMenuContextoPlanilha();
+      return;
+    }
+
+    e.preventDefault();
+    if (!celulasSelecionadas.has(info.td)) {
+      celulasSelecionadas.forEach(td => td.classList.remove("celula-selecionada"));
+      celulasSelecionadas.clear();
+      info.td.classList.add("celula-selecionada");
+      celulasSelecionadas.add(info.td);
+      celulaAncora = info;
+      celulaFocoAtual = info;
+      atualizarBarraFlutuanteSelecao();
+    }
+    abrirMenuContextoPlanilha(e.clientX, e.clientY);
+  });
+
+  // Fechar menu de contexto ao clicar fora ou rolar
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("#menuContextoPlanilha")) {
+      fecharMenuContextoPlanilha();
     }
   });
+  window.addEventListener("scroll", fecharMenuContextoPlanilha, true);
+  window.addEventListener("resize", fecharMenuContextoPlanilha);
 
   // Interações de Toque (Mobile / Tablet)
   document.addEventListener("touchstart", (e) => {
     if (e.touches.length !== 1) return;
     if (e.target.closest("#barraFlutuanteSelecao")) return;
+    if (e.target.closest("#menuContextoPlanilha")) return;
     if (e.target.closest(".btn-toggle-selecao")) return;
+
+    fecharMenuContextoPlanilha();
 
     const info = obterInfoCelula(e.target);
     if (!info) return;
@@ -7436,29 +7854,39 @@
     }
 
     clearTimeout(touchHoldTimer);
+    const touch = e.touches[0];
+    const tx = touch.clientX;
+    const ty = touch.clientY;
     touchHoldTimer = setTimeout(() => {
       try { if (navigator.vibrate) navigator.vibrate(40); } catch (v) {}
-      alternarSelecaoCelula(info, true);
-      celulaAncora = info;
-      mostrarAviso("🔲 Célula selecionada! Toque em outra célula para selecionar o bloco.");
-    }, 350);
+      if (!celulasSelecionadas.has(info.td)) {
+        celulasSelecionadas.forEach(td => td.classList.remove("celula-selecionada"));
+        celulasSelecionadas.clear();
+        info.td.classList.add("celula-selecionada");
+        celulasSelecionadas.add(info.td);
+        celulaAncora = info;
+        celulaFocoAtual = info;
+        atualizarBarraFlutuanteSelecao();
+      }
+      abrirMenuContextoPlanilha(tx, ty);
+    }, 320);
   }, { passive: false });
 
   document.addEventListener("touchend", () => { clearTimeout(touchHoldTimer); });
   document.addEventListener("touchmove", () => { clearTimeout(touchHoldTimer); });
 
-  // Ações de Teclado
+  // Ações de Teclado (Ctrl+C, Ctrl+X, Ctrl+V, Delete, Backspace, Navegação)
   document.addEventListener("keydown", (e) => {
-    // 1. Apagar células selecionadas com Delete ou Backspace
+    // 1. Operações com Células Selecionadas
     if (celulasSelecionadas.size > 0) {
-      if (e.key === "Backspace" || e.key === "Delete") {
-        e.preventDefault();
-        limparCelulasSelecionadas();
-        return;
-      }
       if ((e.ctrlKey || e.metaKey) && (e.key === "c" || e.key === "C")) {
         e.preventDefault();
         copiarCelulasSelecionadas();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === "x" || e.key === "X")) {
+        e.preventDefault();
+        cortarCelulasSelecionadas();
         return;
       }
       if ((e.ctrlKey || e.metaKey) && (e.key === "v" || e.key === "V")) {
@@ -7467,12 +7895,19 @@
         return;
       }
       if (e.key === "Escape") {
+        fecharMenuContextoPlanilha();
         limparSelecaoCelulas();
         return;
       }
-    } else if (celulasSelecionadas.size === 1 && e.key === "Escape") {
-      limparSelecaoCelulas();
-      return;
+      if (e.key === "Delete" || (celulasSelecionadas.size > 1 && e.key === "Backspace")) {
+        const targetInput = e.target instanceof HTMLInputElement ? e.target : null;
+        const isEditingMidText = targetInput && !targetInput.classList.contains("num") && targetInput.selectionStart !== 0 && targetInput.selectionEnd !== targetInput.value.length;
+        if (!isEditingMidText) {
+          e.preventDefault();
+          limparCelulasSelecionadas();
+          return;
+        }
+      }
     }
 
     // 2. Navegação entre células e expansão com teclas de direção
@@ -7574,6 +8009,13 @@
       celulaFocoAtual = info;
       if (!celulaAncora || celulasSelecionadas.size <= 1) {
         celulaAncora = info;
+        if (celulasSelecionadas.size === 0 || (celulasSelecionadas.size === 1 && !celulasSelecionadas.has(info.td))) {
+          celulasSelecionadas.forEach(td => td.classList.remove("celula-selecionada"));
+          celulasSelecionadas.clear();
+          info.td.classList.add("celula-selecionada");
+          celulasSelecionadas.add(info.td);
+          atualizarBarraFlutuanteSelecao();
+        }
       }
     }
     if (e.target.classList && e.target.classList.contains("num")) {

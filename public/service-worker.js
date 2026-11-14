@@ -1,5 +1,5 @@
 // Service Worker para Andamento dos quarteirões - PWA (100% Offline-Ready)
-const CACHE_NAME = 'andamento-quarteiroes-v4';
+const CACHE_NAME = 'andamento-quarteiroes-v5';
 
 const STATIC_ASSETS = [
   '/',
@@ -52,8 +52,16 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Não interceptar requisições em tempo real do Firebase Realtime Database
-  if (url.hostname.includes('firebaseio.com') || url.pathname.includes('/.lp') || url.pathname.includes('/.ws')) {
+  // Não interceptar requisições em tempo real do Firebase Realtime Database e APIs Google
+  if (
+    url.hostname.includes('firebaseio.com') ||
+    url.hostname.includes('firebasedatabase.app') ||
+    url.hostname.includes('firebaseapp.com') ||
+    url.hostname.includes('googleapis.com') ||
+    url.hostname.includes('gstatic.com') ||
+    url.pathname.includes('/.lp') ||
+    url.pathname.includes('/.ws')
+  ) {
     return;
   }
 
