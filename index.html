@@ -2286,10 +2286,13 @@
     };
   }
 
-  function salvarResumoReconhecimentoPMCD() {
+  function salvarResumoReconhecimentoPMCD(permitirVazio = false) {
     if (!pmcdSincAtiva || !dbPMCDRef) return;
     try {
       const payload = obterDadosResumoReconhecimento();
+      if (!permitirVazio && payload.totalQuarteiroes === 0 && !temDadosReaisLocais()) {
+        return;
+      }
       ultimoTimestampResumoLocal = payload.timestamp;
       dbPMCDRef.set(payload)
         .then(() => {
@@ -2518,18 +2521,104 @@
     }
   }
 
+  function temDadosReais(dados) {
+    if (!dados || typeof dados !== "object") return false;
+    try {
+      const sems = normalizarArraySemanas(dados.semanas);
+      for (const s of sems) {
+        if (!s) continue;
+        if (s.titulo && String(s.titulo).trim() !== "") return true;
+        if (Array.isArray(s.datas) && s.datas.some(d => d && String(d).trim() !== "")) return true;
+        if (s.valores && typeof s.valores === "object") {
+          for (const k of Object.keys(s.valores)) {
+            const v = String(s.valores[k] == null ? "" : s.valores[k]).trim();
+            if (v !== "" && v !== "0" && v !== "00") return true;
+          }
+        }
+      }
+      if (dados.statusQuarteiroes && Object.keys(dados.statusQuarteiroes).length > 0) return true;
+      const df = dados.dadosFormularios;
+      if (df && typeof df === "object") {
+        if (df.boletins && df.boletins.porQuarteirao && Object.keys(df.boletins.porQuarteirao).length > 0) {
+          for (const qKey of Object.keys(df.boletins.porQuarteirao)) {
+            const fq = df.boletins.porQuarteirao[qKey];
+            if (fq && fq.imoveis && Object.keys(fq.imoveis).length > 0) {
+              for (const ik of Object.keys(fq.imoveis)) {
+                const im = fq.imoveis[ik];
+                if (im && Object.values(im).some(v => v && String(v).trim() !== "")) return true;
+              }
+            }
+          }
+        }
+        for (const secao of ["resumo", "bases", "coflagrados"]) {
+          if (df[secao] && typeof df[secao] === "object") {
+            for (const rk of Object.keys(df[secao])) {
+              const row = df[secao][rk];
+              if (row && typeof row === "object") {
+                for (const c of Object.keys(row)) {
+                  const v = String(row[c] == null ? "" : row[c]).trim();
+                  if (v !== "" && v !== "0" && v !== "00") return true;
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  function temDadosReaisLocais() {
+    return temDadosReais({
+      semanas: coletarDados(),
+      statusQuarteiroes: statusQuarteiroes,
+      dadosFormularios: dadosFormularios
+    });
+  }
+
+  function salvarBackupEmergenciaLocal() {
+    try {
+      const semanas = coletarDados();
+      const snapshot = {
+        timestamp: Date.now(),
+        semanas: semanas,
+        statusQuarteiroes: statusQuarteiroes,
+        paginas: paginas,
+        cabecalhos: cabecalhos,
+        rodapes: rodapes,
+        dadosFormularios: dadosFormularios,
+        liraaSelecionados: Array.from(quarteiroesLiraaSelecionados)
+      };
+      if (temDadosReais(snapshot)) {
+        localStorage.setItem("diario_backup_emergencia_v1", JSON.stringify(snapshot));
+      }
+    } catch (e) {}
+  }
+
   function isErroPermissaoFirebase(err) {
     const msg = String((err && (err.code || err.message)) || err || "").toLowerCase();
     return msg.includes("permission") || msg.includes("unauthorized") || msg.includes("401");
   }
 
-  function enviarDadosLocaisParaNuvem(forcarToast = false) {
+  function enviarDadosLocaisParaNuvem(forcarToast = false, permitirVazio = false) {
     if (!nuvemAtiva || !dbRef || !navigator.onLine) return;
     if (sincronizandoNuvem) return;
 
+    const semanasCheck = coletarDados();
+    const payloadCheck = {
+      semanas: semanasCheck,
+      statusQuarteiroes: statusQuarteiroes,
+      dadosFormularios: dadosFormularios
+    };
+    // Proteção absoluta: nunca enviar estado completamente vazio para a nuvem por acidente
+    if (!permitirVazio && !temDadosReais(payloadCheck)) {
+      marcarAlteracaoPendente(false);
+      atualizarBadgeNuvem(firebaseSocketConectado && !erroPermissaoNuvem);
+      return;
+    }
+
     sincronizandoNuvem = true;
     try {
-      const semanas = coletarDados();
       const agora = Math.max(Date.now(), (Number(ultimoTimestampLocal) || 0) + 1);
       ultimoTimestampLocal = agora;
       try { localStorage.setItem(STORAGE_ULTIMO_TS, String(agora)); } catch (e) {}
@@ -2539,7 +2628,7 @@
 
       const payloadBruto = {
         timestamp: agora,
-        semanas: semanas,
+        semanas: semanasCheck,
         statusQuarteiroes: statusQuarteiroes,
         paginas: paginas,
         cabecalhos: cabecalhos,
@@ -2677,9 +2766,9 @@
       if (sincronizandoNuvem) return;
 
       const dadosNuvem = snapshot.val();
+      const localTemDados = temDadosReaisLocais();
       if (!dadosNuvem) {
-        const semanasLocais = coletarDados();
-        if (semanasLocais && semanasLocais.length > 0) {
+        if (localTemDados) {
           enviarDadosLocaisParaNuvem();
         } else {
           atualizarBadgeNuvem(true);
@@ -2687,6 +2776,7 @@
         return;
       }
 
+      const remotoTemDados = temDadosReais(dadosNuvem);
       const tsRemoto = Number(dadosNuvem.timestamp) || 0;
       const tsLocal = Number(ultimoTimestampLocal) || 0;
 
@@ -2696,16 +2786,22 @@
         return;
       }
 
-      const pendente = (function() {
-        try { return localStorage.getItem(STORAGE_PENDENTE_NUVEM) === "1"; } catch (e) { return false; }
-      })();
-
-      if (pendente || tsLocal > tsRemoto) {
+      // Nunca deixar dados locais reais serem apagados por snapshot remoto vazio
+      if (localTemDados && !remotoTemDados) {
         enviarDadosLocaisParaNuvem();
         return;
       }
 
-      if (tsRemoto <= tsLocal) {
+      const pendente = (function() {
+        try { return localStorage.getItem(STORAGE_PENDENTE_NUVEM) === "1"; } catch (e) { return false; }
+      })();
+
+      if ((pendente || tsLocal > tsRemoto) && (localTemDados || !remotoTemDados)) {
+        enviarDadosLocaisParaNuvem();
+        return;
+      }
+
+      if (tsRemoto <= tsLocal && (localTemDados || !remotoTemDados)) {
         atualizarBadgeNuvem(true);
         return;
       }
@@ -2779,8 +2875,15 @@
   function aplicarDadosRemotos(dados) {
     try {
       if (!dados) return;
+      if (temDadosReaisLocais() && !temDadosReais(dados)) {
+        console.warn("Proteção ativada: bloqueada sobrescrita de dados locais por snapshot remoto vazio.");
+        return;
+      }
       const semanasRemotas = normalizarArraySemanas(dados.semanas);
       if (semanasRemotas.length === 0 && !dados.statusQuarteiroes && !dados.dadosFormularios) return;
+
+      // Salva cópia de segurança local antes de aplicar alteração remota
+      salvarBackupEmergenciaLocal();
 
       statusQuarteiroes = dados.statusQuarteiroes || {};
       paginas = Object.assign({ andamento: 1, concluidos: 1, boletins: 1, resumo: 1, bases: 1, basesliraa: 1, coflagrados: 1, resumogeral: 1 }, dados.paginas);
@@ -6525,7 +6628,7 @@
     return semanas;
   }
 
-  function salvar() {
+  function salvar(permitirVazio = false) {
     try {
       const semanas = coletarDados();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(semanas));
@@ -6551,13 +6654,15 @@
           dadosFormularios: dadosFormularios,
           liraaSelecionados: Array.from(quarteiroesLiraaSelecionados)
         };
-        localStorage.setItem(STORAGE_BACKUP_COMPLETO, JSON.stringify(backupCompleto));
+        if (permitirVazio || temDadosReais(backupCompleto)) {
+          localStorage.setItem(STORAGE_BACKUP_COMPLETO, JSON.stringify(backupCompleto));
+        }
       } catch (e) {}
 
       marcarAlteracaoPendente(true);
 
       if (navigator.onLine && nuvemAtiva && dbRef && !erroPermissaoNuvem) {
-        enviarDadosLocaisParaNuvem(true);
+        enviarDadosLocaisParaNuvem(true, permitirVazio);
       } else {
         atualizarBadgeNuvem(false);
         mostrarAviso("💾 Salvo no aparelho (offline)");
@@ -6599,7 +6704,7 @@
       }
 
       if (semanas.length === 0) {
-        const backup = localStorage.getItem(STORAGE_BACKUP_COMPLETO);
+        const backup = localStorage.getItem(STORAGE_BACKUP_COMPLETO) || localStorage.getItem("diario_backup_emergencia_v1");
         if (backup) {
           try {
             const bParsed = JSON.parse(backup);
@@ -8113,7 +8218,7 @@
     document.getElementById("semanas").innerHTML = "";
     semanaCount = 0;
     criarSemana();
-    salvar();
+    salvar(true);
     atualizarResumoSemanal(); atualizarTotalImoveis(); atualizarInformados();
     atualizarAndamento(); atualizarConcluidos(); renderizarFormularioBoletins();
     renderizarResumoIntegrado();
